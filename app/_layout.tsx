@@ -5,7 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from '@react-navigation/native';
-import { useFonts,
+import {
+  useFonts,
   RedditSans_400Regular,
   RedditSans_500Medium,
   RedditSans_600SemiBold,
@@ -21,42 +22,30 @@ import { AppToastHost, buildToastConfig } from '@/components/ui/Toast';
 import { NavigationDarkTheme, NavigationLightTheme } from '@/constants/theme';
 import { initSentry } from '@/services/sentry';
 
-// Initialise Sentry before any React render (module-level, runs once)
 initSentry();
 
+// Hold the native splash until fonts are ready
 SplashScreen.preventAutoHideAsync();
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
 
 function RootNavigator() {
   const { isDark } = useAppTheme();
 
   return (
     <ThemeProvider value={isDark ? NavigationDarkTheme : NavigationLightTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modal"
-          options={{
-            presentation: 'modal',
-            title: '',
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="form-demo"
-          options={{
-            presentation: 'card',
-            title: 'Registration',
-            headerShown: false,
-          }}
-        />
+      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+        {/* Entry point — decides splash / onboarding / auth / app */}
+        <Stack.Screen name="index" />
+
+        {/* Route groups */}
+        <Stack.Screen name="(onboarding)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(app)" />
+
+        {/* Global overlays */}
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="form-demo" />
       </Stack>
       <StatusBar style={isDark ? 'light' : 'dark'} />
-
-      {/* Toast must be last child so it renders above everything */}
       <AppToastHost config={buildToastConfig(isDark)} />
     </ThemeProvider>
   );
@@ -74,6 +63,7 @@ function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
+      // Native splash done — our in-app splash in index.tsx takes over
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
@@ -99,5 +89,4 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
 });
 
-// Wrap with Sentry for native crash reporting + JS error boundaries
 export default Sentry.wrap(RootLayout);
