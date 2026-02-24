@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+echo "🧪 Running tests before push..."
+
+# Run Jest test suite (fail fast on any failure)
+npm run test:ci
+
+echo "✅ All tests passed — pushing!"

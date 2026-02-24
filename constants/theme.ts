@@ -1,53 +1,44 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Fashionistar Design System — Theme
+ * Re-exports the full token set and provides navigation theme objects.
  */
 
-import { Platform } from 'react-native';
+import { DarkTheme, DefaultTheme, Theme } from '@react-navigation/native';
+import { ThemeColors, Palette } from './colors';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export { ThemeColors, Palette };
+export type { AppThemeColors, ColorScheme } from './colors';
+export { FontFamily, FontSize, LineHeight, LetterSpacing, FontWeight, TextVariants } from './typography';
+export type { TextVariant } from './typography';
+export { Spacing, BorderRadius, Shadow } from './spacing';
+export type { SpacingKey, BorderRadiusKey } from './spacing';
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+// Backward-compat "Colors" export consumed by existing tab layout
+export const Colors = ThemeColors;
+
+/** React Navigation theme wrappers */
+export const NavigationLightTheme: Theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Palette.primary,
+    background: ThemeColors.light.background,
+    card: ThemeColors.light.surface,
+    text: ThemeColors.light.text,
+    border: ThemeColors.light.border,
+    notification: Palette.accent,
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+export const NavigationDarkTheme: Theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Palette.primaryLight,
+    background: ThemeColors.dark.background,
+    card: ThemeColors.dark.surface,
+    text: ThemeColors.dark.text,
+    border: ThemeColors.dark.border,
+    notification: Palette.accent,
   },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+};
