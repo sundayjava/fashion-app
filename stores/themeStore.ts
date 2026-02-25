@@ -18,6 +18,14 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: 'fashionistar-theme',
       storage: createJSONStorage(() => AsyncStorage),
+      // Always start with system theme on a fresh install.
+      // If the user has never explicitly chosen a theme, keep 'system'.
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<ThemeState>),
+        // If no preference was persisted yet, stay on 'system'
+        preference: (persisted as Partial<ThemeState>)?.preference ?? 'system',
+      }),
     }
   )
 );

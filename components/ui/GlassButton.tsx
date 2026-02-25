@@ -5,12 +5,13 @@ import { useAppTheme } from '@/context/ThemeContext';
 import { BlurView } from 'expo-blur';
 import React from 'react';
 import {
-    ActivityIndicator,
-    Pressable,
-    PressableProps,
-    StyleSheet,
-    View,
-    ViewStyle,
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  View,
+  ViewStyle,
 } from 'react-native';
 import { Typography } from './Typography';
 
@@ -63,7 +64,7 @@ export function GlassButton({
   const bgColor = tintConfig[variant];
 
   const labelColor: Record<ButtonVariant, string> = {
-    glass: colors.text,
+    glass: isDark ? 'rgba(255,255,255,0.92)' : '#1a1a2e',
     primary: Palette.white,
     secondary: colors.text,
     outline: colors.primary,
@@ -86,7 +87,7 @@ export function GlassButton({
         styles.inner,
         sizeStyles[size],
         fullWidth && styles.fullWidth,
-        { borderColor: borderColor[variant], borderWidth: isOutline || isGlass ? 1 : 0 },
+        { borderColor: borderColor[variant], borderWidth: isOutline ? 1 : 0 },
         (disabled || loading) && styles.disabled,
       ]}
     >
@@ -106,27 +107,76 @@ export function GlassButton({
     </View>
   );
 
+  const glassShadow: ViewStyle = isGlass
+    ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isDark ? 0.4 : 0.12,
+        shadowRadius: 8,
+        elevation: 4,
+      }
+    : Shadow.glass;
+
   const container: ViewStyle[] = [
-    styles.container,
+    isGlass ? {} : styles.pillRadius,
     fullWidth ? styles.fullWidth : {},
-    Shadow.glass,
+    glassShadow,
     style as ViewStyle,
   ];
 
+  // White edge highlight — key to the raised-glass look
+  const glassBorderColor = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.85)';
+
   if (isGlass) {
+    // iOS: native UIVisualEffectView via BlurView
+    if (Platform.OS === 'ios') {
+      return (
+        <Pressable
+          {...rest}
+          disabled={disabled || loading}
+          style={({ pressed }) => [container, pressed && styles.pressed]}
+        >
+          <BlurView
+            intensity={80}
+            tint={isDark ? 'systemThinMaterialDark' : 'systemThinMaterialLight'}
+            style={[
+              styles.blurContainer,
+              styles.pillRadius,
+              {
+                borderWidth: 1.5,
+                borderColor: glassBorderColor,
+              },
+            ]}
+          >
+            {inner}
+          </BlurView>
+        </Pressable>
+      );
+    }
+
+    // Android: no backdrop-blur API.
+    // Pressable must NOT have overflow/borderRadius — it causes a rectangular clip artifact.
+    // All visual styling lives on the inner View only.
     return (
       <Pressable
         {...rest}
         disabled={disabled || loading}
-        style={({ pressed }) => [container, pressed && styles.pressed]}
+        style={({ pressed }) => [pressed && styles.pressed]}
       >
-        <BlurView
-          intensity={25}
-          tint={isDark ? 'dark' : 'light'}
-          style={[styles.blurContainer, { borderRadius: BorderRadius.lg }]}
+        <View
+          style={[
+            styles.glassAndroid,
+            fullWidth && styles.fullWidth,
+            {
+              backgroundColor: isDark
+                ? 'rgba(255, 255, 255, 0.12)'
+                : 'rgba(255, 255, 255, 0.45)',
+              borderColor: glassBorderColor,
+            },
+          ]}
         >
           {inner}
-        </BlurView>
+        </View>
       </Pressable>
     );
   }
@@ -137,7 +187,7 @@ export function GlassButton({
       disabled={disabled || loading}
       style={({ pressed }) => [
         container,
-        { backgroundColor: bgColor, borderRadius: BorderRadius.lg },
+        { backgroundColor: bgColor, borderRadius: BorderRadius.lg, overflow: 'hidden' },
         isGhost && { shadowOpacity: 0 },
         pressed && styles.pressed,
       ]}
@@ -148,18 +198,22 @@ export function GlassButton({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
+  pillRadius: {
+    borderRadius: BorderRadius.full,
   },
   blurContainer: {
+    overflow: 'hidden',
+  },
+  // Android glass inner view — all visual styling here, Pressable stays transparent
+  glassAndroid: {
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5,
     overflow: 'hidden',
   },
   inner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: BorderRadius.lg,
   },
   fullWidth: {
     width: '100%',

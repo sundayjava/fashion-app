@@ -1,4 +1,3 @@
-import { AppSplash } from '@/components/screens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -30,8 +29,9 @@ export default function Index() {
     bootstrap();
   }, []);
 
-  if (state === 'splash') return <AppSplash />;
-  if (state === 'onboarding') return <Redirect href="/(onboarding)" />;
-  if (state === 'auth') return <Redirect href="/(auth)/login" />;
-  return <Redirect href="/(app)/(tabs)" />;
+  // if (state === 'splash') return <AppSplash />;
+  // if (state === 'onboarding') return <Redirect href="/(app)/(onboarding)" />;
+  // if (state === 'auth') return <Redirect href="/(app)/(auth)/login" />;
+  // return <Redirect href="/(app)/(tabs)" />;
+  return <Redirect href="/(app)/(onboarding)" />;
 }

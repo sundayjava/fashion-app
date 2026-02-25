@@ -1,26 +1,26 @@
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider } from '@react-navigation/native';
+import { AppToastHost, buildToastConfig } from '@/components/ui/Toast';
+import { NavigationDarkTheme, NavigationLightTheme } from '@/constants/theme';
+import { AppThemeProvider, useAppTheme } from '@/context/ThemeContext';
+import { initSentry } from '@/services/sentry';
 import {
-  useFonts,
   RedditSans_400Regular,
+  RedditSans_400Regular_Italic,
   RedditSans_500Medium,
   RedditSans_600SemiBold,
   RedditSans_700Bold,
-  RedditSans_400Regular_Italic,
   RedditSans_700Bold_Italic,
+  useFonts,
 } from '@expo-google-fonts/reddit-sans';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Sentry from '@sentry/react-native';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { AppThemeProvider, useAppTheme } from '@/context/ThemeContext';
-import { AppToastHost, buildToastConfig } from '@/components/ui/Toast';
-import { NavigationDarkTheme, NavigationLightTheme } from '@/constants/theme';
-import { initSentry } from '@/services/sentry';
+import { ThemeProvider } from '@react-navigation/native';
+import * as Sentry from '@sentry/react-native';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 initSentry();
 
@@ -37,8 +37,6 @@ function RootNavigator() {
         <Stack.Screen name="index" />
 
         {/* Route groups */}
-        <Stack.Screen name="(onboarding)" />
-        <Stack.Screen name="(auth)" />
         <Stack.Screen name="(app)" />
 
         {/* Global overlays */}

@@ -1,7 +1,8 @@
+import { AppThemeColors, ColorScheme, ThemeColors } from '@/constants/colors';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemePreference, useThemeStore } from '@/stores/themeStore';
 import React, { createContext, useContext, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
-import { ThemeColors, AppThemeColors, ColorScheme } from '@/constants/colors';
-import { useThemeStore, ThemePreference } from '@/stores/themeStore';
+import { Appearance } from 'react-native';
 
 interface ThemeContextValue {
   colors: AppThemeColors;
@@ -23,12 +24,11 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useColorScheme();
   const { preference, setPreference } = useThemeStore();
 
-  const scheme: ColorScheme = useMemo(() => {
-    if (preference === 'system') {
-      return systemScheme === 'dark' ? 'dark' : 'light';
-    }
-    return preference;
-  }, [preference, systemScheme]);
+  // Derive scheme inline (no memo) so any state change immediately produces
+  // the correct value — memoization was masking stale reads on Android.
+  const resolvedSystem: ColorScheme =
+    (systemScheme ?? Appearance.getColorScheme()) === 'dark' ? 'dark' : 'light';
+  const scheme: ColorScheme = preference === 'system' ? resolvedSystem : preference;
 
   const value = useMemo<ThemeContextValue>(
     () => ({

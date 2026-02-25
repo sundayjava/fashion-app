@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Typography,
-  GlassButton,
-  GlassCard,
-  Divider,
+  ControlledDOB,
   ControlledInput,
   ControlledPhone,
-  ControlledDOB,
+  Divider,
+  GlassButton,
+  GlassCard,
   showToast,
+  Typography,
 } from '@/components/ui';
-import { registerSchema, RegisterFormValues } from '@/utils/validation';
-import { useAppTheme } from '@/context/ThemeContext';
 import { Spacing } from '@/constants/spacing';
+import { useAppTheme } from '@/context/ThemeContext';
+import { RegisterFormValues, registerSchema } from '@/utils/validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function FormDemoScreen() {
   const { colors } = useAppTheme();
@@ -54,7 +54,7 @@ export default function FormDemoScreen() {
   };
 
   return (
-    <ScrollView
+    <ScrollView 
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={[
         styles.scroll,

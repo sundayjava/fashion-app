@@ -5,6 +5,7 @@ export { AppBottomSheet } from './AppBottomSheet';
 export type { AppBottomSheetProps } from './AppBottomSheet';
 export { AppModal, ConfirmModal } from './AppModal';
 export { Avatar } from './Avatar';
+export { BackButton } from './BackButton';
 export { Badge } from './Badge';
 export { ControlledDOB, ControlledInput, ControlledPhone } from './ControlledInputs';
 export { Divider } from './Divider';

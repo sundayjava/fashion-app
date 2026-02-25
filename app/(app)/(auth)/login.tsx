@@ -1,31 +1,33 @@
 import {
-    ControlledInput,
-    Divider,
-    GlassButton,
-    GlassCard,
-    Typography,
+  ControlledInput,
+  Divider,
+  GlassButton,
+  GlassCard,
+  Typography,
 } from '@/components/ui';
 import { Palette } from '@/constants/colors';
 import { BorderRadius, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
 import { LoginFormValues, loginSchema } from '@/utils/validation';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const { colors, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
+  const { method } = useLocalSearchParams<{ method: 'email' | 'phone' }>();
+  const [authMethod, setAuthMethod] = useState<'email' | 'phone'>(method ?? 'email');
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -109,16 +111,52 @@ export default function LoginScreen() {
 
         {/* Form card */}
         <GlassCard style={styles.card}>
-          <ControlledInput
-            control={control}
-            name="email"
-            label="Email"
-            placeholder="you@fashionistar.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            returnKeyType="next"
-          />
+
+          {/* Method toggle */}
+          <View style={[styles.toggle, { backgroundColor: colors.surface }]}>
+            {(['email', 'phone'] as const).map((m) => (
+              <Pressable
+                key={m}
+                onPress={() => setAuthMethod(m)}
+                style={[
+                  styles.toggleOption,
+                  authMethod === m && { backgroundColor: colors.background, borderRadius: BorderRadius.md },
+                ]}
+              >
+                <Typography
+                  variant="caption"
+                  weight={authMethod === m ? 'semiBold' : 'regular'}
+                  color={authMethod === m ? colors.text : colors.textSecondary}
+                >
+                  {m === 'email' ? 'Email' : 'Phone'}
+                </Typography>
+              </Pressable>
+            ))}
+          </View>
+
+          {authMethod === 'email' ? (
+            <ControlledInput
+              control={control}
+              name="email"
+              label="Email"
+              placeholder="you@fashionistar.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              returnKeyType="next"
+            />
+          ) : (
+            <ControlledInput
+              control={control}
+              name="email"
+              label="Phone number"
+              placeholder="+1 000 000 0000"
+              keyboardType="phone-pad"
+              autoCapitalize="none"
+              autoComplete="tel"
+              returnKeyType="next"
+            />
+          )}
 
           <ControlledInput
             control={control}
@@ -230,5 +268,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  toggle: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.md,
+    padding: 4,
+  },
+  toggleOption: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
   },
 });
