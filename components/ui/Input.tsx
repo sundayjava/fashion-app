@@ -1,15 +1,15 @@
+import { BorderRadius, Spacing } from '@/constants/spacing';
+import { FontFamily, FontSize } from '@/constants/typography';
+import { useAppTheme } from '@/context/ThemeContext';
 import React, { forwardRef, useState } from 'react';
 import {
+  Pressable,
+  StyleSheet,
   TextInput,
   TextInputProps,
   View,
-  StyleSheet,
-  Pressable,
   ViewStyle,
 } from 'react-native';
-import { BorderRadius, Shadow, Spacing } from '@/constants/spacing';
-import { FontFamily, FontSize } from '@/constants/typography';
-import { useAppTheme } from '@/context/ThemeContext';
 import { Typography } from './Typography';
 
 interface AppInputProps extends TextInputProps {
@@ -33,12 +33,24 @@ export const AppInput = forwardRef<TextInput, AppInputProps>(
       onRightIconPress,
       containerStyle,
       style,
+      onFocus,
+      onBlur,
       ...rest
     },
     ref
   ) => {
     const { colors } = useAppTheme();
     const [focused, setFocused] = useState(false);
+
+    const handleFocus = (e: any) => {
+      setFocused(true);
+      onFocus?.(e);
+    };
+
+    const handleBlur = (e: any) => {
+      setFocused(false);
+      onBlur?.(e);
+    };
 
     const borderColor = error
       ? colors.error
@@ -62,7 +74,6 @@ export const AppInput = forwardRef<TextInput, AppInputProps>(
               borderColor,
               borderWidth: 1,
             },
-            focused && Shadow.sm,
           ]}
         >
           {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
@@ -79,8 +90,8 @@ export const AppInput = forwardRef<TextInput, AppInputProps>(
               style,
             ]}
             placeholderTextColor={colors.textTertiary}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             {...rest}
           />
           {rightIcon && (

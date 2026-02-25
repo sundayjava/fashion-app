@@ -82,6 +82,13 @@ export const registerSchema = yup.object({
   dob: dobSchema,
 });
 
+/** Email or Phone step (first registration step) */
+export const emailPhoneSchema = yup.object().shape({
+  email: emailSchema.optional().default(''),
+  phone: phoneSchema.optional().default(undefined),
+  isBusiness: yup.boolean().default(false),
+});
+
 /** Login form */
 export const loginSchema = yup.object({
   email: emailSchema,
@@ -103,6 +110,7 @@ export const profileSchema = yup.object({
   dob: dobSchema.optional(),
 });
 
+export type EmailPhoneFormValues = yup.InferType<typeof emailPhoneSchema>;
 export type RegisterFormValues = yup.InferType<typeof registerSchema>;
 export type LoginFormValues = yup.InferType<typeof loginSchema>;
 export type ForgotPasswordFormValues = yup.InferType<typeof forgotPasswordSchema>;

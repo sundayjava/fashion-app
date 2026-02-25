@@ -1,4 +1,4 @@
-import { GlassButton } from '@/components/ui';
+import { GlassButton, Typography } from '@/components/ui';
 import { BorderRadius, FontFamily, Palette, Spacing } from '@/constants/theme';
 import React from 'react';
 import {
@@ -17,11 +17,18 @@ interface OnboardingTwoProps {
   isDark: boolean;
   insets: ReturnType<typeof useSafeAreaInsets>;
   onFinish: (method: 'email' | 'phone') => void;
+  skip: () => void;
 }
 
-export const OnboardingTwo = ({ isDark, insets, onFinish }: OnboardingTwoProps) => {
+export const OnboardingTwo = ({ isDark, insets, onFinish, skip }: OnboardingTwoProps) => {
   return (
     <View style={styles.step2Container}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View />
+        <Pressable onPress={() => skip()} hitSlop={16}>
+          <Typography color={Palette.primary} weight='bold'>Skip</Typography>
+        </Pressable>
+      </View>
       {/* Image card area */}
       <View style={styles.step2CardWrap}>
         <View
@@ -43,10 +50,10 @@ export const OnboardingTwo = ({ isDark, insets, onFinish }: OnboardingTwoProps) 
           {'Join AI Fashion\nAssistant'}
         </Text>
 
-          <View style={styles.socialRow}>
-            <GlassButton onPress={() => onFinish('email')} variant="glass" label={`Continue with Email`} fullWidth size='md' style={{ borderRadius: Spacing[2] }} />
-            <GlassButton onPress={() => onFinish('phone')} variant="glass" label={`Continue with Phone`} fullWidth size='md' style={{ borderRadius: Spacing[2] }} />
-          </View>
+        <View style={styles.socialRow}>
+          <GlassButton onPress={() => onFinish('email')} variant="glass" label={`Continue with Email`} fullWidth size='md' style={{ borderRadius: Spacing[2] }} />
+          <GlassButton onPress={() => onFinish('phone')} variant="glass" label={`Continue with Phone`} fullWidth size='md' style={{ borderRadius: Spacing[2] }} />
+        </View>
 
         {/* Login link */}
         <View style={styles.loginRow}>
@@ -79,6 +86,15 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: BorderRadius['2xl'],
   },
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    zIndex: 10,
+  },
+
   step2Bottom: { flex: 1, paddingHorizontal: Spacing.lg, justifyContent: 'flex-end' },
   step2Title: {
     fontSize: 30,

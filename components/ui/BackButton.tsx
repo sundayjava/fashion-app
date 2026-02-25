@@ -1,3 +1,4 @@
+import { ArrowBack } from '@/assets/icons';
 import { FontFamily } from '@/constants/typography';
 import { useAppTheme } from '@/context/ThemeContext';
 import React from 'react';
@@ -17,6 +18,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
   hitSlop = 16,
 }) => {
   const { isDark } = useAppTheme();
+  const colors = useAppTheme().colors;
 
   // No onPress → invisible placeholder that preserves header layout
   if (!onPress) {
@@ -35,10 +37,10 @@ export const BackButton: React.FC<BackButtonProps> = ({
           { backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.07)' },
         ]}
       >
-        <Text style={[styles.arrow, { color: isDark ? '#fff' : '#222' }]}>‹</Text>
+        <ArrowBack width={24} height={24} color={colors.icon} />
       </View>
       {label ? (
-        <Text style={[styles.label, { color: isDark ? '#fff' : '#222' }]}>{label}</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       ) : null}
     </Pressable>
   );

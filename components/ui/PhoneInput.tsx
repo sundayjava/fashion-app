@@ -1,24 +1,25 @@
-import React, { forwardRef, useState, useMemo, useCallback } from 'react';
-import {
-  View,
-  TextInput,
-  TextInputProps,
-  Pressable,
-  Modal,
-  FlatList,
-  StyleSheet,
-  ViewStyle,
-  Platform,
-  KeyboardAvoidingView,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
-import { COUNTRIES, Country } from '@/data/countries';
+import { ArrowDown } from '@/assets/icons';
 import { BorderRadius, Shadow, Spacing } from '@/constants/spacing';
 import { FontFamily, FontSize } from '@/constants/typography';
 import { useAppTheme } from '@/context/ThemeContext';
+import { COUNTRIES, Country } from '@/data/countries';
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetFlatList,
+  BottomSheetModal,
+  BottomSheetTextInput,
+} from '@gorhom/bottom-sheet';
+import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Typography } from './Typography';
-import { AppInput } from './Input';
 
 export interface PhoneValue {
   country: Country;
@@ -53,8 +54,8 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
     },
     ref
   ) => {
-    const { colors, isDark } = useAppTheme();
-    const insets = useSafeAreaInsets();
+    const { colors } = useAppTheme();
+    const sheetRef = useRef<BottomSheetModal>(null);
 
     const initialCountry =
       (defaultCountryCode && COUNTRIES.find((c) => c.code === defaultCountryCode)) ||
@@ -63,7 +64,6 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
     const [country, setCountry] = useState<Country>(value?.country ?? initialCountry);
     const [number, setNumber] = useState(value?.number ?? '');
     const [focused, setFocused] = useState(false);
-    const [pickerOpen, setPickerOpen] = useState(false);
     const [search, setSearch] = useState('');
 
     const filtered = useMemo(
@@ -82,7 +82,7 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
     const handleSelect = useCallback(
       (c: Country) => {
         setCountry(c);
-        setPickerOpen(false);
+        sheetRef.current?.close();
         setSearch('');
         const next: PhoneValue = { country: c, number, full: `${c.dial}${number}` };
         onChange?.(next);
@@ -98,6 +98,21 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
         onChange?.({ country, number: clean, full: `${country.dial}${clean}` });
       },
       [country, onChange]
+    );
+
+    const snapPoints = useMemo(() => ['70%', '90%'], []);
+
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          opacity={0.5}
+          pressBehavior="close"
+        />
+      ),
+      []
     );
 
     const borderColor = error ? colors.error : focused ? colors.borderFocused : colors.border;
@@ -124,7 +139,7 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
         >
           {/* Country Trigger */}
           <Pressable
-            onPress={() => setPickerOpen(true)}
+            onPress={() => sheetRef.current?.present()}
             style={[
               styles.dialButton,
               { borderRightColor: colors.border, borderRightWidth: StyleSheet.hairlineWidth },
@@ -137,9 +152,7 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
             <Typography variant="bodyMedium" color={colors.text}>
               {country.dial}
             </Typography>
-            <Typography variant="caption" color={colors.textTertiary} style={styles.chevron}>
-              ▾
-            </Typography>
+            <ArrowDown width={18} height={18} color={colors.textTertiary}/>
           </Pressable>
 
           {/* Number input */}
@@ -174,115 +187,104 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
           </Typography>
         )}
 
-        {/* Country Picker Modal */}
-        <Modal
-          visible={pickerOpen}
-          transparent
-          animationType="slide"
-          statusBarTranslucent
-          onRequestClose={() => {
-            setPickerOpen(false);
-            setSearch('');
+        {/* Country Picker Bottom Sheet Modal */}
+        <BottomSheetModal
+          ref={sheetRef}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          backdropComponent={renderBackdrop}
+          backgroundStyle={{
+            backgroundColor: colors.surfaceElevated,
           }}
+          handleIndicatorStyle={{ backgroundColor: colors.border }}
+          onDismiss={() => setSearch('')}
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
+          android_keyboardInputMode="adjustResize"
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            style={styles.modalWrapper}
-          >
-            {/* Backdrop */}
-            <Pressable
-              style={styles.backdrop}
-              onPress={() => {
-                setPickerOpen(false);
-                setSearch('');
-              }}
-            >
-              <BlurView
-                intensity={15}
-                tint={isDark ? 'dark' : 'light'}
-                style={StyleSheet.absoluteFillObject}
-              />
-            </Pressable>
+          <View style={styles.sheetContent}>
+            <Typography variant="h4" style={styles.sheetTitle}>
+              Select Country
+            </Typography>
 
-            {/* Sheet */}
-            <View
+            {/* Search - use BottomSheetTextInput for proper keyboard handling */}
+            <BottomSheetTextInput
+              placeholder="Search country or code…"
+              placeholderTextColor={colors.textTertiary}
+              value={search}
+              onChangeText={setSearch}
+              autoCorrect={false}
               style={[
-                styles.sheet,
+                styles.searchInput,
                 {
-                  backgroundColor: colors.surfaceElevated,
-                  paddingBottom: insets.bottom + Spacing.md,
-                  borderColor: colors.glassBorder,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  borderColor: colors.border,
                 },
               ]}
-            >
-              {/* Handle */}
-              <View style={[styles.handle, { backgroundColor: colors.border }]} />
+            />
 
-              <Typography variant="h4" style={styles.sheetTitle}>
-                Select Country
-              </Typography>
-
-              {/* Search */}
-              <AppInput
-                placeholder="Search country or code…"
-                value={search}
-                onChangeText={setSearch}
-                containerStyle={styles.search}
-                autoCorrect={false}
-              />
-
-              <FlatList
-                data={filtered}
-                keyExtractor={(item) => item.code}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 8 }}
-                ItemSeparatorComponent={() => (
-                  <View style={[styles.sep, { backgroundColor: colors.border }]} />
-                )}
-                renderItem={({ item }) => {
-                  const selected = item.code === country.code;
-                  return (
-                    <Pressable
-                      onPress={() => handleSelect(item)}
-                      style={({ pressed }) => [
-                        styles.countryItem,
-                        pressed && { backgroundColor: colors.surface },
-                        selected && { backgroundColor: colors.primary + '18' },
-                      ]}
+            <BottomSheetFlatList<Country>
+              data={filtered}
+              keyExtractor={(item: Country) => item.code}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 8 }}
+              ListEmptyComponent={
+                <View style={styles.emptyState}>
+                  <Typography variant="body" color={colors.textSecondary} align="center">
+                    No countries found
+                  </Typography>
+                  <Typography variant="caption" color={colors.textTertiary} align="center" style={{ marginTop: 4 }}>
+                    Try a different search term
+                  </Typography>
+                </View>
+              }
+              ItemSeparatorComponent={() => (
+                <View style={[styles.sep, { backgroundColor: colors.border }]} />
+              )}
+              renderItem={({ item }: { item: Country }) => {
+                const selected = item.code === country.code;
+                return (
+                  <Pressable
+                    onPress={() => handleSelect(item)}
+                    style={({ pressed }) => [
+                      styles.countryItem,
+                      pressed && { backgroundColor: colors.surface },
+                      selected && { backgroundColor: colors.primary + '18' },
+                    ]}
+                  >
+                    <Typography variant="body" style={styles.itemFlag}>
+                      {item.flag}
+                    </Typography>
+                    <Typography
+                      variant="body"
+                      weight={selected ? 'semiBold' : 'regular'}
+                      style={{ flex: 1 }}
                     >
-                      <Typography variant="body" style={styles.itemFlag}>
-                        {item.flag}
-                      </Typography>
+                      {item.name}
+                    </Typography>
+                    <Typography
+                      variant="bodyMedium"
+                      color={selected ? colors.primary : colors.textTertiary}
+                    >
+                      {item.dial}
+                    </Typography>
+                    {selected && (
                       <Typography
                         variant="body"
-                        weight={selected ? 'semiBold' : 'regular'}
-                        style={{ flex: 1 }}
+                        color={colors.primary}
+                        style={styles.checkmark}
                       >
-                        {item.name}
+                        ✓
                       </Typography>
-                      <Typography
-                        variant="bodyMedium"
-                        color={selected ? colors.primary : colors.textTertiary}
-                      >
-                        {item.dial}
-                      </Typography>
-                      {selected && (
-                        <Typography
-                          variant="body"
-                          color={colors.primary}
-                          style={styles.checkmark}
-                        >
-                          ✓
-                        </Typography>
-                      )}
-                    </Pressable>
-                  );
-                }}
-              />
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
+                    )}
+                  </Pressable>
+                );
+              }}
+            />
+          </View>
+        </BottomSheetModal>
       </View>
     );
   }
@@ -322,37 +324,25 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     minHeight: 48,
   },
-  // Modal
-  modalWrapper: {
+  // Bottom Sheet
+  sheetContent: {
     flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-  },
-  sheet: {
-    borderTopLeftRadius: BorderRadius['3xl'],
-    borderTopRightRadius: BorderRadius['3xl'],
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    maxHeight: '80%',
     paddingTop: Spacing.sm,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: BorderRadius.full,
-    alignSelf: 'center',
-    marginBottom: Spacing.md,
   },
   sheetTitle: {
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.md,
   },
-  search: {
+  searchInput: {
     marginHorizontal: Spacing.lg,
     marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    fontSize: FontSize.base,
+    fontFamily: FontFamily.regular,
+    minHeight: 48,
   },
   countryItem: {
     flexDirection: 'row',
@@ -373,5 +363,11 @@ const styles = StyleSheet.create({
   sep: {
     height: StyleSheet.hairlineWidth,
     marginLeft: Spacing.lg + 32 + Spacing.md,
+  },
+  emptyState: {
+    paddingVertical: Spacing.xl * 2,
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

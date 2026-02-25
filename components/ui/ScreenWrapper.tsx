@@ -31,13 +31,13 @@ import { Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
 import React from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    ScrollViewProps,
-    StyleProp,
-    StyleSheet,
-    ViewStyle,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  ScrollViewProps,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
 } from 'react-native';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -61,6 +61,9 @@ interface ScreenWrapperProps {
   /** Wrap in a KeyboardAvoidingView (useful for forms). */
   keyboardAvoiding?: boolean;
 
+  /** Keyboard vertical offset for KeyboardAvoidingView. */
+  keyboardVerticalOffset?: number;
+
   /** Additional style applied to the outer SafeAreaView. */
   style?: StyleProp<ViewStyle>;
 
@@ -77,6 +80,7 @@ export function ScreenWrapper({
   scrollable = false,
   scrollViewProps,
   keyboardAvoiding = false,
+  keyboardVerticalOffset = 0,
   style,
   padded = false,
 }: ScreenWrapperProps) {
@@ -99,7 +103,8 @@ export function ScreenWrapper({
   const wrapped = keyboardAvoiding ? (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+      keyboardVerticalOffset={keyboardVerticalOffset}
     >
       {inner}
     </KeyboardAvoidingView>

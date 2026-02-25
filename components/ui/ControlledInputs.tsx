@@ -15,11 +15,11 @@
  */
 
 import React from 'react';
-import { Controller, Control, FieldValues, Path } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { TextInputProps, ViewStyle } from 'react-native';
+import { DOBInput } from './DOBInput';
 import { AppInput } from './Input';
 import { PhoneInput } from './PhoneInput';
-import { DOBInput } from './DOBInput';
-import { ViewStyle, TextInputProps } from 'react-native';
 
 // ─── Generic Text Input ───────────────────────────────────────────────────
 

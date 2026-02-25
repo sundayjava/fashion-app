@@ -32,7 +32,7 @@ function RootNavigator() {
 
   return (
     <ThemeProvider value={isDark ? NavigationDarkTheme : NavigationLightTheme}>
-      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <Stack screenOptions={{ headerShown: false, animation: 'ios_from_right' }}>
         {/* Entry point — decides splash / onboarding / auth / app */}
         <Stack.Screen name="index" />
 

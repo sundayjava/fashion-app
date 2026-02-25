@@ -3,6 +3,8 @@
  * Based on a 4pt grid system
  */
 
+import { Dimensions, Platform } from "react-native";
+
 export const Spacing = {
   0: 0,
   1: 4,
@@ -81,3 +83,6 @@ export const Shadow = {
 
 export type SpacingKey = keyof typeof Spacing;
 export type BorderRadiusKey = keyof typeof BorderRadius;
+
+export const isIOS = Platform.OS === 'ios';
+export const {width, height} = Dimensions.get('window');

@@ -1,7 +1,7 @@
+import { FontFamily, FontWeight, TextVariant, TextVariants } from '@/constants/typography';
+import { useAppTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { Text, TextProps, TextStyle } from 'react-native';
-import { TextVariant, TextVariants, FontFamily, FontWeight } from '@/constants/typography';
-import { useAppTheme } from '@/context/ThemeContext';
 
 type FontWeightKey = keyof typeof FontWeight; // 'regular' | 'medium' | 'semiBold' | 'bold'
 
