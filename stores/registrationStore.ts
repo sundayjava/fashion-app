@@ -10,7 +10,8 @@ export interface RegistrationData {
   // Step 1: Email or Phone
   email?: string;
   phone?: PhoneValue;
-  isBusiness?: boolean; // Optional field to indicate if user is registering as a business
+  isBusiness?: boolean;
+  registrationMethod?: 'email' | 'phone';
   
   // Step 2: User details
   firstName?: string;
@@ -34,6 +35,7 @@ interface RegistrationStore extends RegistrationData {
   setPhone: (phone: PhoneValue) => void;
   setFirstName: (firstName: string) => void;
   setIsBusiness: (isBusiness: boolean) => void;
+  setRegistrationMethod: (method: 'email' | 'phone') => void;
   setLastName: (lastName: string) => void;
   setUsername: (username: string) => void;
   setPassword: (password: string) => void;
@@ -50,6 +52,7 @@ const initialState: RegistrationData = {
   email: undefined,
   phone: undefined,
   firstName: undefined,
+  registrationMethod: undefined,
   lastName: undefined,
   username: undefined,
   password: undefined,
@@ -67,9 +70,10 @@ export const useRegistrationStore = create<RegistrationStore>()(
     (set, get) => ({
       ...initialState,
       
-      setEmail: (email) => set({ email, phone: undefined }), // Clear phone when setting email
-      setPhone: (phone) => set({ phone, email: undefined }), // Clear email when setting phone
+      setEmail: (email) => set({ email, phone: undefined, registrationMethod: 'email' }), // Clear phone when setting email
+      setPhone: (phone) => set({ phone, email: undefined, registrationMethod: 'phone' }), // Clear email when setting phone
       setIsBusiness: (isBusiness) => set({ isBusiness }), // Set business flag
+      setRegistrationMethod: (method) => set({ registrationMethod: method }),
       setFirstName: (firstName) => set({ firstName }),
       setLastName: (lastName) => set({ lastName }),
       setUsername: (username) => set({ username }),
@@ -90,6 +94,7 @@ export const useRegistrationStore = create<RegistrationStore>()(
           email: state.email,
           phone: state.phone,
           firstName: state.firstName,
+          registrationMethod: state.registrationMethod,
           lastName: state.lastName,
           username: state.username,
           password: state.password,

@@ -84,16 +84,37 @@ export const registerSchema = yup.object({
 
 /** Email or Phone step (first registration step) */
 export const emailPhoneSchema = yup.object().shape({
-  email: emailSchema.optional().default(''),
+  email: yup
+    .string()
+    .trim()
+    .transform((value) => (value === '' ? undefined : value)) // Convert empty string to undefined
+    .lowercase()
+    .matches(
+      /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/,
+      'Enter a valid email address'
+    )
+    .optional(),
   phone: phoneSchema.optional().default(undefined),
   isBusiness: yup.boolean().default(false),
 });
 
-/** Login form */
-export const loginSchema = yup.object({
-  email: emailSchema,
+/** Login form - Email */
+export const loginEmailSchema = yup.object({
+  emailOrPhone: emailSchema,
   password: yup.string().required('Password is required'),
 });
+
+/** Login form - Phone */
+export const loginPhoneSchema = yup.object({
+  emailOrPhone: yup
+    .string()
+    .required('Phone number is required')
+    .matches(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Enter a valid phone number'),
+  password: yup.string().required('Password is required'),
+});
+
+/** Legacy login schema (email only) */
+export const loginSchema = loginEmailSchema;
 
 /** Forgot password */
 export const forgotPasswordSchema = yup.object({

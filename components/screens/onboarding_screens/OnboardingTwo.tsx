@@ -1,4 +1,4 @@
-import { GlassButton, Typography } from '@/components/ui';
+import { GlassButton, ORBT, Typography } from '@/components/ui';
 import { BorderRadius, FontFamily, Palette, Spacing } from '@/constants/theme';
 import React from 'react';
 import {
@@ -18,11 +18,13 @@ interface OnboardingTwoProps {
   insets: ReturnType<typeof useSafeAreaInsets>;
   onFinish: (method: 'email' | 'phone') => void;
   skip: () => void;
+  login: () => void;
 }
 
-export const OnboardingTwo = ({ isDark, insets, onFinish, skip }: OnboardingTwoProps) => {
+export const OnboardingTwo = ({ isDark, insets, onFinish, skip, login }: OnboardingTwoProps) => {
   return (
     <View style={styles.step2Container}>
+      <ORBT />
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <View />
         <Pressable onPress={() => skip()} hitSlop={16}>
@@ -65,7 +67,7 @@ export const OnboardingTwo = ({ isDark, insets, onFinish, skip }: OnboardingTwoP
           >
             {'Already have an account? '}
           </Text>
-          <Pressable onPress={() => onFinish('email')} hitSlop={8}>
+          <Pressable onPress={() => login()} hitSlop={8}>
             <Text style={[styles.loginLink, { color: isDark ? '#fff' : '#111' }]}>
               Login
             </Text>

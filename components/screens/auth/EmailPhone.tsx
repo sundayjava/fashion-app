@@ -7,21 +7,16 @@ import { useAppTheme } from '@/context/ThemeContext';
 import { useRegistrationStore } from '@/stores/registrationStore';
 import { EmailPhoneFormValues, emailPhoneSchema } from '@/utils/validation';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Localization from 'expo-localization';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Keyboard, Platform, Pressable, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, NativeModules, Platform, Pressable, TouchableWithoutFeedback, View } from 'react-native';
 
-interface EmailPhoneProps {
-  method: 'email' | 'phone';
-}
-
-export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
+export const EmailPhone = () => {
   const router = useRouter();
   const { colors } = useAppTheme();
   const [modalVisible, setModalVisible] = useState(false);
-  const [detectedCountryCode, setDetectedCountryCode] = useState<string>('NG');
+  const [detectedCountryCode, setDetectedCountryCode] = useState<string>('US');
 
   // Zustand store selectors
   const storedEmail = useRegistrationStore((state) => state.email);
@@ -29,6 +24,7 @@ export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
   const setEmail = useRegistrationStore((state) => state.setEmail);
   const setPhone = useRegistrationStore((state) => state.setPhone);
   const setIsBusiness = useRegistrationStore((state) => state.setIsBusiness);
+  const method = useRegistrationStore((state) => state.registrationMethod) || 'email';
 
   // React Hook Form setup
   const {
@@ -36,6 +32,7 @@ export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
     handleSubmit,
     watch,
     trigger,
+    reset: resetForm,
     formState: { isSubmitting },
   } = useForm<EmailPhoneFormValues>({
     resolver: yupResolver(emailPhoneSchema) as any,
@@ -52,33 +49,38 @@ export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
   const phoneValue = watch('phone');
 
   // Check if current field has value
-  const hasValue = method === 'email' 
-    ? !!emailValue?.trim() 
+  const hasValue = method === 'email'
+    ? !!emailValue?.trim()
     : !!phoneValue?.full;
 
-  // Auto-detect country code from device locale
   useEffect(() => {
     if (method === 'phone') {
       try {
-        // Get country code from device locale (e.g., 'US', 'NG', 'GB')
-        const locales = Localization.getLocales();
-        const deviceCountry = locales[0]?.regionCode;
-        if (deviceCountry) {
-          setDetectedCountryCode(deviceCountry);
+        // Get device locale using React Native's built-in capabilities
+        const deviceLanguage = Platform.OS === 'ios'
+          ? NativeModules.SettingsManager?.settings?.AppleLocale ||
+          NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] // iOS 13+
+          : NativeModules.I18nManager?.localeIdentifier; // Android
+
+        if (deviceLanguage) {
+          // Extract country code from locale string (e.g., 'en_US' -> 'US', 'en-NG' -> 'NG')
+          const countryMatch = deviceLanguage.match(/[-_]([A-Z]{2})/);
+          const countryCode = countryMatch ? countryMatch[1] : 'US';
+          setDetectedCountryCode(countryCode);
         }
       } catch (error) {
         console.log('Failed to detect country:', error);
-        // Keep default 'NG'
+        // Keep default 'US'
       }
     }
   }, [method]);
 
   // Validate and show modal
   const handleContinue = async () => {
-    // Validate the current field before showing modal
+    // resetStore()
     const fieldToValidate = method === 'email' ? 'email' : 'phone';
     const isFieldValid = await trigger(fieldToValidate);
-    
+
     if (isFieldValid) {
       setModalVisible(true);
     }
@@ -92,15 +94,16 @@ export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
     } else if (method === 'phone' && data.phone) {
       setPhone(data.phone as any); // Type cast needed due to yup inference
     }
-    
+
     setIsBusiness(!!data.isBusiness);
-    
+
     console.log("All details are: ", data);
-    
+
     // Close modal and navigate
     setModalVisible(false);
-    // TODO: Navigate to next registration step
-    // router.push('/(app)/(auth)/register-details');
+    router.push(
+      data.isBusiness ? '/business-details' : '/basic-profile'
+    );
   };
 
   // Handle modal continue button click
@@ -190,7 +193,7 @@ export const EmailPhone: React.FC<EmailPhoneProps> = ({ method }) => {
         <Typography variant="body" color={colors.textSecondary}>
           Please confirm whether you own a brand. This helps us customize your experience and unlock the right tools for you.
         </Typography>
-        
+
         <View style={{ marginTop: Spacing.lg }}>
           <Controller
             control={control}

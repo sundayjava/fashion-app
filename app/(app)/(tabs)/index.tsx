@@ -1,23 +1,24 @@
-import React, { useRef, useState } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BottomSheet from '@gorhom/bottom-sheet';
-import { useRouter } from 'expo-router';
-import { useAppTheme } from '@/context/ThemeContext';
 import {
-  Typography,
+  AppBottomSheet,
+  AppInput,
+  AppModal,
+  Avatar,
+  Badge,
+  ConfirmModal,
+  Divider,
   GlassButton,
   GlassCard,
-  AppInput,
-  Badge,
-  Avatar,
-  Divider,
-  AppBottomSheet,
-  AppModal,
-  ConfirmModal,
   showToast,
+  Typography,
 } from '@/components/ui';
+import { appName } from '@/constants/settings';
 import { Spacing } from '@/constants/spacing';
+import { useAppTheme } from '@/context/ThemeContext';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { colors } = useAppTheme();
@@ -44,7 +45,7 @@ export default function HomeScreen() {
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
           <Typography variant="overline" color={colors.textTertiary}>
-            Fashionistar
+            {appName}
           </Typography>
           <Typography variant="h2">Design System</Typography>
         </View>

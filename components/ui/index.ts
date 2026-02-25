@@ -14,6 +14,7 @@ export { GlassButton } from './GlassButton';
 export { GlassCard } from './GlassCard';
 export { GlassTabBar } from './GlassTabBar';
 export { AppInput } from './Input';
+export { ORBT } from './ORBT';
 export { PhoneInput } from './PhoneInput';
 export type { PhoneValue } from './PhoneInput';
 export { ScreenWrapper } from './ScreenWrapper';

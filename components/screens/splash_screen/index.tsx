@@ -1,14 +1,15 @@
 import { Typography } from '@/components/ui/Typography';
 import { Palette } from '@/constants/colors';
+import { appName } from '@/constants/settings';
 import { useAppTheme } from '@/context/ThemeContext';
 import { BlurView } from 'expo-blur';
 import React, { useEffect, useRef } from 'react';
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    StyleSheet,
-    View,
+  Animated,
+  Dimensions,
+  Easing,
+  StyleSheet,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -156,9 +157,9 @@ export function AppSplash() {
             color={isDark ? Palette.white : Palette.black}
             align="center"
             tracking={3}
-            style={styles.appName}
+            style={[styles.appName, {textTransform: 'uppercase'}]}
           >
-            FASHIONISTAR
+            {appName}
           </Typography>
         </Animated.View>
 

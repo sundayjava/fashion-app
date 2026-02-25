@@ -40,6 +40,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
+import { ORBT } from './ORBT';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -117,6 +118,7 @@ export function ScreenWrapper({
       edges={edges}
       style={[styles.flex, { backgroundColor: bg }, padded && styles.padded, style]}
     >
+      <ORBT />
       {wrapped}
     </SafeAreaView>
   );

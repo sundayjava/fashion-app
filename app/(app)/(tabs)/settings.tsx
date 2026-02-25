@@ -1,11 +1,12 @@
-import React from 'react';
-import { ScrollView, View, Pressable, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppTheme } from '@/context/ThemeContext';
-import { Typography, GlassCard, Divider, Avatar, showToast } from '@/components/ui';
-import { Spacing, BorderRadius } from '@/constants/spacing';
+import { Avatar, Divider, GlassCard, showToast, Typography } from '@/components/ui';
 import { Palette } from '@/constants/colors';
+import { appName } from '@/constants/settings';
+import { BorderRadius, Spacing } from '@/constants/spacing';
+import { useAppTheme } from '@/context/ThemeContext';
 import { ThemePreference } from '@/stores/themeStore';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const THEME_OPTIONS: { label: string; value: ThemePreference; icon: string; desc: string }[] = [
   { label: 'System', value: 'system', icon: '⚙️', desc: 'Follows your device setting' },
@@ -38,7 +39,7 @@ export default function SettingsScreen() {
         <View style={styles.profileRow}>
           <Avatar initials="FI" size="lg" />
           <View style={{ flex: 1, marginLeft: Spacing.md }}>
-            <Typography variant="title">Fashionistar User</Typography>
+            <Typography variant="title">{appName} User</Typography>
             <Typography variant="caption" color={colors.textSecondary}>
               user@fashionistar.com
             </Typography>
