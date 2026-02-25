@@ -139,13 +139,13 @@ describe('dobSchema', () => {
 describe('loginSchema', () => {
   it('accepts valid login credentials', async () => {
     await expect(
-      loginSchema.validate({ email: 'user@test.com', password: 'Password1!' })
+      loginSchema.validate({ emailOrPhone: 'user@test.com', password: 'Password1!' })
     ).resolves.toBeTruthy();
   });
 
   it('rejects invalid email in login', async () => {
     await expect(
-      loginSchema.validate({ email: 'bademail', password: 'Password1!' })
+      loginSchema.validate({ emailOrPhone: 'bademail', password: 'Password1!' })
     ).rejects.toThrow();
   });
 });
