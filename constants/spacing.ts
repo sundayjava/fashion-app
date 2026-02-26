@@ -73,11 +73,11 @@ export const Shadow = {
     elevation: 12,
   },
   glass: {
-    shadowColor: '#000',
+    shadowColor: '#fff',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 30,
-    elevation: 8,
+    elevation: 10,
   },
 };
 

@@ -67,6 +67,19 @@ export const usernameSchema = yup
 
 // ─── Full form schemas ─────────────────────────────────────────────────────
 
+/** Password creation form */
+export const passwordCreationSchema = yup.object({
+  password: passwordSchema,
+  confirmPassword: yup
+    .string()
+    .required('Please confirm your password')
+    .oneOf([yup.ref('password')], 'Passwords do not match'),
+  acceptTerms: yup
+    .boolean()
+    .oneOf([true], 'You must accept the terms and conditions')
+    .required(),
+});
+
 /** Registration form */
 export const registerSchema = yup.object({
   password: passwordSchema,
@@ -140,6 +153,7 @@ export const profileSchema = yup.object({
 
 export type EmailPhoneFormValues = yup.InferType<typeof emailPhoneSchema>;
 export type BusinessRegisterFormValues = yup.InferType<typeof businessRegisterSchema>;
+export type PasswordCreationFormValues = yup.InferType<typeof passwordCreationSchema>;
 export type RegisterFormValues = yup.InferType<typeof registerSchema>;
 export type LoginFormValues = yup.InferType<typeof loginSchema>;
 export type ForgotPasswordFormValues = yup.InferType<typeof forgotPasswordSchema>;

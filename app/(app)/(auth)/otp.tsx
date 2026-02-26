@@ -46,12 +46,7 @@ const Otp = () => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // TODO: Replace with actual API call
-      console.log('Verifying OTP:', code, 'for:', contact);
-
-      // On success, navigate to next step
-      // router.push('/business-details'); // Or appropriate next screen
+      router.replace({ pathname: '/password' }); // Navigate to main app on success
     } catch (_) {
       setError('Invalid OTP. Please try again.');
       setOtp('');

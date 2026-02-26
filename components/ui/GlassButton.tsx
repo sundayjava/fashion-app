@@ -137,13 +137,12 @@ export function GlassButton({
           style={({ pressed }) => [container, pressed && styles.pressed]}
         >
           <BlurView
-            intensity={80}
-            tint={isDark ? 'systemThinMaterialDark' : 'systemThinMaterialLight'}
+            intensity={40}
             style={[
               styles.blurContainer,
               styles.pillRadius,
               {
-                borderWidth: 1.5,
+                borderWidth: 1,
                 borderColor: glassBorderColor,
               },
             ]}
@@ -169,7 +168,7 @@ export function GlassButton({
             fullWidth && styles.fullWidth,
             {
               backgroundColor: isDark
-                ? 'rgba(255, 255, 255, 0.10)'
+                ? 'rgba(255, 255, 255, 0.05)'
                 : 'rgba(248, 248, 248, 0.85)',
               borderColor: glassBorderColor,
             },
@@ -229,7 +228,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   pressed: {
-    opacity: 0.8,
+    opacity: 0.6,
     transform: [{ scale: 0.98 }],
   },
 });

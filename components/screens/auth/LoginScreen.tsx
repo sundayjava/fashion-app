@@ -1,6 +1,6 @@
-import { BackButton, ControlledInput, GlassButton, GlassCard, ScreenWrapper, Typography } from '@/components/ui';
+import { BackButton, ControlledInput, GlassButton, GlassCard, Logo, ScreenWrapper, Typography } from '@/components/ui';
 import { appName } from '@/constants/settings';
-import { BorderRadius, Palette, Spacing } from '@/constants/theme';
+import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { loginEmailSchema, loginPhoneSchema } from '@/utils/validation';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -63,24 +63,7 @@ export const LoginScreen = () => {
                 </View>
                 <View style={styles.header}>
 
-                    <View
-                        style={[
-                            styles.logoMark,
-                            {
-                                backgroundColor: Palette.primary + '22',
-                                borderColor: Palette.primary + '55',
-                            },
-                        ]}
-                    >
-                        <Typography
-                            variant="h3"
-                            weight="bold"
-                            color={Palette.primary}
-                            align="center"
-                        >
-                            F
-                        </Typography>
-                    </View>
+                    <Logo/>
 
                     <Typography variant="h2" weight="bold" color={colors.text} align="center">
                         Welcome back
@@ -190,16 +173,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: Spacing.xl,
         gap: Spacing.sm,
-    },
-
-    logoMark: {
-        width: 40,
-        height: 40,
-        borderRadius: BorderRadius.lg,
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: Spacing.lg,
     },
 
     card: {

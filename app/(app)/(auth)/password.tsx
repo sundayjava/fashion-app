@@ -1,12 +1,6 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import { Password } from '@/components/screens/auth';
+import React from 'react';
 
-const Password = () => {
-  return (
-    <View>
-      <Text>Password</Text>
-    </View>
-  )
+export default function PasswordScreen() {
+  return <Password/>;
 }
-
-export default Password

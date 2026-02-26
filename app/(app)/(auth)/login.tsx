@@ -1,4 +1,4 @@
-import { LoginScreen } from '@/components/screens/auth/LoginScreen';
+import { LoginScreen } from '@/components/screens/auth';
 import React from 'react';
 
 export default function Login() {

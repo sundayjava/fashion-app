@@ -182,14 +182,14 @@ export function DOBInput({
 
             <View style={styles.iosButtons}>
               <GlassButton
-                variant="outline"
+                variant="glass"
                 label="Cancel"
                 size="md"
                 onPress={handleIOSCancel}
                 style={{ flex: 1 }}
               />
               <GlassButton
-                variant="primary"
+                variant="glass"
                 label="Confirm"
                 size="md"
                 onPress={handleIOSConfirm}
