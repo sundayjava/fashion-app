@@ -41,7 +41,6 @@ function RootNavigator() {
 
         {/* Global overlays */}
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="form-demo" />
       </Stack>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <AppToastHost config={buildToastConfig(isDark)} />

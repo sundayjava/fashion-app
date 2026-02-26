@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, ViewProps, StyleSheet, ViewStyle } from 'react-native';
-import { BlurView } from 'expo-blur';
-import { BorderRadius, Shadow, Spacing } from '@/constants/spacing';
+import { BorderRadius, isIOS, Shadow, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
+import { BlurView } from 'expo-blur';
+import React from 'react';
+import { StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
 
 interface GlassCardProps extends ViewProps {
   blur?: boolean;
@@ -24,7 +24,7 @@ export function GlassCard({
 
   const containerStyle: ViewStyle[] = [
     styles.card,
-    Shadow.glass,
+    isIOS ? Shadow.glass : {},
     { borderColor: colors.glassBorder, borderWidth: 1 },
     style as ViewStyle,
   ];

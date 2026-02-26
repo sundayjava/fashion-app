@@ -7,8 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Keyboard, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 type LoginFormValues = {
     emailOrPhone: string;
@@ -16,8 +15,7 @@ type LoginFormValues = {
 };
 
 export const LoginScreen = () => {
-    const { colors, isDark } = useAppTheme();
-    const insets = useSafeAreaInsets();
+    const { colors } = useAppTheme();
     const [showPassword, setShowPassword] = useState(false);
     const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email');
 
@@ -47,9 +45,8 @@ export const LoginScreen = () => {
     }, [authMethod, setValue, clearErrors]);
 
     const onSubmit = async (_data: LoginFormValues) => {
-        console.log("Login: ", _data)
         await new Promise<void>((res) => setTimeout(res, 800)); // simulate request
-        // router.replace('/(app)/(tabs)');
+        router.replace('/(app)/(tabs)');
     };
 
     return (
@@ -59,6 +56,7 @@ export const LoginScreen = () => {
             keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
             style={{ paddingVertical: Spacing.md }}
         >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={{ flex: 1 }}>
                 <View style={{ marginBottom: Spacing.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <BackButton onPress={() => router.back()} />
@@ -182,6 +180,7 @@ export const LoginScreen = () => {
                     />
                 </GlassCard>
             </View>
+            </TouchableWithoutFeedback>
         </ScreenWrapper>
     )
 }

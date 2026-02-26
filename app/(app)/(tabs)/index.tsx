@@ -209,12 +209,6 @@ export default function HomeScreen() {
             onPress={() => router.push('/modal')}
           />
         </View>
-        <GlassButton
-          variant="primary"
-          label="Open Registration Form Demo →"
-          fullWidth
-          onPress={() => router.push('/form-demo')}
-        />
       </View>
 
       {/* Bottom Sheet */}

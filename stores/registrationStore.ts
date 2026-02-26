@@ -7,23 +7,15 @@ import { createJSONStorage, persist } from 'zustand/middleware';
  * Registration data stored across multiple screens
  */
 export interface RegistrationData {
-  // Step 1: Email or Phone
   email?: string;
   phone?: PhoneValue;
   isBusiness?: boolean;
   registrationMethod?: 'email' | 'phone';
-  
-  // Step 2: User details
   firstName?: string;
   lastName?: string;
-  username?: string;
-  
-  // Step 3: Password
   password?: string;
-  
-  // Step 4: Additional info (optional)
+  businessName?: string;
   dob?: Date;
-  bio?: string;
 }
 
 /**
@@ -35,12 +27,11 @@ interface RegistrationStore extends RegistrationData {
   setPhone: (phone: PhoneValue) => void;
   setFirstName: (firstName: string) => void;
   setIsBusiness: (isBusiness: boolean) => void;
+  setBusinessName: (businessName: string) => void;
   setRegistrationMethod: (method: 'email' | 'phone') => void;
   setLastName: (lastName: string) => void;
-  setUsername: (username: string) => void;
   setPassword: (password: string) => void;
   setDob: (dob: Date) => void;
-  setBio: (bio: string) => void;
   
   // Utility methods
   reset: () => void;
@@ -54,11 +45,10 @@ const initialState: RegistrationData = {
   firstName: undefined,
   registrationMethod: undefined,
   lastName: undefined,
-  username: undefined,
   password: undefined,
   dob: undefined,
-  bio: undefined,
   isBusiness: undefined,
+  businessName: undefined,
 };
 
 /**
@@ -76,10 +66,9 @@ export const useRegistrationStore = create<RegistrationStore>()(
       setRegistrationMethod: (method) => set({ registrationMethod: method }),
       setFirstName: (firstName) => set({ firstName }),
       setLastName: (lastName) => set({ lastName }),
-      setUsername: (username) => set({ username }),
       setPassword: (password) => set({ password }),
       setDob: (dob) => set({ dob }),
-      setBio: (bio) => set({ bio }),
+      setBusinessName: (businessName) => set({ businessName }),
       
       reset: () => set(initialState),
       
@@ -96,11 +85,10 @@ export const useRegistrationStore = create<RegistrationStore>()(
           firstName: state.firstName,
           registrationMethod: state.registrationMethod,
           lastName: state.lastName,
-          username: state.username,
           password: state.password,
           dob: state.dob,
-          bio: state.bio,
           isBusiness: state.isBusiness,
+          businessName: state.businessName,
         };
       },
     }),

@@ -39,10 +39,10 @@ export const dobSchema = yup
   .required('Date of birth is required')
   .max(new Date(), 'Date of birth cannot be in the future')
   .min(new Date(1900, 0, 1), 'Enter a valid date of birth')
-  .test('is-adult', 'You must be at least 13 years old', (value) => {
+  .test('is-adult', 'You must be at least 10 years old', (value) => {
     if (!value) return false;
     const cutoff = new Date();
-    cutoff.setFullYear(cutoff.getFullYear() - 13);
+    cutoff.setFullYear(cutoff.getFullYear() - 10);
     return value <= cutoff;
   });
 
@@ -69,16 +69,23 @@ export const usernameSchema = yup
 
 /** Registration form */
 export const registerSchema = yup.object({
-  firstName: nameSchema('First name'),
-  lastName: nameSchema('Last name'),
-  username: usernameSchema,
-  email: emailSchema,
   password: passwordSchema,
   confirmPassword: yup
     .string()
     .required('Please confirm your password')
     .oneOf([yup.ref('password')], 'Passwords do not match'),
-  phone: phoneSchema,
+});
+
+export const businessRegisterSchema = yup.object({
+  businessName: yup
+    .string()
+    .trim()
+    .transform((value) => (value === '' ? undefined : value))
+    .min(2, 'Business name must be at least 2 characters')
+    .max(50, 'Business name must be at most 50 characters')
+    .optional(),
+  firstName: nameSchema('First name'),
+  lastName: nameSchema('Last name'),
   dob: dobSchema,
 });
 
@@ -132,6 +139,7 @@ export const profileSchema = yup.object({
 });
 
 export type EmailPhoneFormValues = yup.InferType<typeof emailPhoneSchema>;
+export type BusinessRegisterFormValues = yup.InferType<typeof businessRegisterSchema>;
 export type RegisterFormValues = yup.InferType<typeof registerSchema>;
 export type LoginFormValues = yup.InferType<typeof loginSchema>;
 export type ForgotPasswordFormValues = yup.InferType<typeof forgotPasswordSchema>;

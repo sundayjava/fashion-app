@@ -32,7 +32,6 @@ export const EmailPhone = () => {
     handleSubmit,
     watch,
     trigger,
-    reset: resetForm,
     formState: { isSubmitting },
   } = useForm<EmailPhoneFormValues>({
     resolver: yupResolver(emailPhoneSchema) as any,
@@ -97,13 +96,9 @@ export const EmailPhone = () => {
 
     setIsBusiness(!!data.isBusiness);
 
-    console.log("All details are: ", data);
-
     // Close modal and navigate
     setModalVisible(false);
-    router.push(
-      data.isBusiness ? '/business-details' : '/basic-profile'
-    );
+    router.push('/business-details');
   };
 
   // Handle modal continue button click

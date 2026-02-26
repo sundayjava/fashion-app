@@ -163,6 +163,7 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
             placeholderTextColor={colors.textTertiary}
             value={number}
             onChangeText={handleNumberChange}
+            selectionColor={colors.primary}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             style={[
@@ -213,6 +214,7 @@ export const PhoneInput = forwardRef<TextInput, PhoneInputProps>(
               placeholderTextColor={colors.textTertiary}
               value={search}
               onChangeText={setSearch}
+              selectionColor={colors.primary}
               autoCorrect={false}
               style={[
                 styles.searchInput,

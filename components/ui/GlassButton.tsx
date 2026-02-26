@@ -169,8 +169,8 @@ export function GlassButton({
             fullWidth && styles.fullWidth,
             {
               backgroundColor: isDark
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(255, 255, 255, 0.45)',
+                ? 'rgba(255, 255, 255, 0.10)'
+                : 'rgba(248, 248, 248, 0.85)',
               borderColor: glassBorderColor,
             },
           ]}
@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     borderWidth: 1.5,
     overflow: 'hidden',
+    elevation: 3,
   },
   inner: {
     flexDirection: 'row',

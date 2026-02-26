@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Pressable,
-  StyleSheet,
-  Platform,
-  Modal,
-  ViewStyle,
-} from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Calendar } from '@/assets/icons/Calendar';
 import { BorderRadius, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
-import { Typography } from './Typography';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import React, { useState } from 'react';
+import {
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { GlassButton } from './GlassButton';
+import { Typography } from './Typography';
 
 interface DOBInputProps {
   label?: string;
@@ -119,9 +120,7 @@ export function DOBInput({
         >
           {value ? formatDate(value) : placeholder}
         </Typography>
-        <Typography variant="body" color={colors.textTertiary} style={styles.calIcon}>
-          📅
-        </Typography>
+        <Calendar color='transparent' stroke={colors.text}/>
       </Pressable>
 
       {(error || hint) && (

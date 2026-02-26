@@ -91,6 +91,7 @@ export const AppInput = forwardRef<TextInput, AppInputProps>(
             ]}
             placeholderTextColor={colors.textTertiary}
             onFocus={handleFocus}
+            selectionColor={colors.primary}
             onBlur={handleBlur}
             {...rest}
           />
