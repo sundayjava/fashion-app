@@ -76,7 +76,7 @@ export const BusinessDetails = () => {
         setLastName(data.lastName);
         setDob(data.dob);
         
-        router.push('/otp');
+        router.push({ pathname: '/otp', params: { flow: 'signup' } }); 
     };
 
     const handleModalContinue = async () => {

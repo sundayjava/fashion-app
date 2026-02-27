@@ -7,7 +7,7 @@ import { useAppTheme } from '@/context/ThemeContext';
 import { useRegistrationStore } from '@/stores/registrationStore';
 import { PasswordCreationFormValues, passwordCreationSchema } from '@/utils/validation';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
@@ -19,7 +19,23 @@ export const Password = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
+    const { method, value, flow, verified } = useLocalSearchParams<{
+        method?: 'email' | 'phone';
+        value?: string;
+        flow?: 'signup' | 'forgot-password';
+        verified?: string;
+    }>();
+
+    // Determine the flow type
+    const isSignupFlow = flow === 'signup' || !flow;
+    const isForgotPasswordFlow = flow === 'forgot-password';
+
     const setPassword = useRegistrationStore((state) => state.setPassword);
+    const storedEmail = useRegistrationStore((state) => state.email);
+    const storedPhone = useRegistrationStore((state) => state.phone);
+
+    // Get contact info based on flow
+    const contactForReset = isForgotPasswordFlow ? value : null;
 
     const {
         control,
@@ -60,12 +76,36 @@ export const Password = () => {
     };
 
     const onSubmit = async (data: PasswordCreationFormValues) => {
-        setPassword(data.password);
-        
         setModalVisible(false);
-        // TODO: Navigate to next step or complete registration
-        // router.push('/next-step');
-        router.replace('/(app)/(tabs)'); // For demo, navigate to main app
+
+        if (isSignupFlow) {
+            // Signup flow: Save to store and complete registration
+            setPassword(data.password);
+            
+            // TODO: Submit full registration to backend
+            // const registrationData = useRegistrationStore.getState().getRegistrationPayload();
+            // await api.register(registrationData);
+            
+            router.replace('/(app)/(tabs)'); // Navigate to main app
+        } else if (isForgotPasswordFlow) {
+            // Forgot password flow: Update password with email/phone
+            try {
+                // TODO: Submit password reset to backend
+                console.log('Resetting password for:', contactForReset, 'via', method);
+                // await api.resetPassword({
+                //   contact: contactForReset,
+                //   method: method,
+                //   newPassword: data.password,
+                //   verified: verified === 'true'
+                // });
+                
+                // Show success message and navigate to login
+                router.replace('/login');
+            } catch (error) {
+                console.error('Password reset failed:', error);
+                // TODO: Show error message
+            }
+        }
     };
 
     const handleModalContinue = async () => {
@@ -83,7 +123,9 @@ export const Password = () => {
                 <View style={{ flex: 1 }}>
                     <View style={styles.header}>
                         <View />
-                        <Typography variant='h3'>Create Password</Typography>
+                        <Typography variant='h3'>
+                            {isForgotPasswordFlow ? 'Create New Password' : 'Create Password'}
+                        </Typography>
                         <View />
                     </View>
 
@@ -97,7 +139,9 @@ export const Password = () => {
                                 marginBottom: Spacing.xl
                             }}
                         >
-                            Create a secure password to protect your account and keep your information safe.
+                            {isForgotPasswordFlow
+                                ? 'Enter your new password below to reset your account.'
+                                : 'Create a secure password to protect your account and keep your information safe.'}
                         </Typography>
 
                         <View style={{ gap: Spacing.lg }}>

@@ -50,7 +50,7 @@ export const LoginScreen = () => {
     };
 
     return (
-        <ScreenWrapper
+        <ScreenWrapper 
             padded
             keyboardAvoiding
             keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
@@ -65,7 +65,7 @@ export const LoginScreen = () => {
 
                     <Logo/>
 
-                    <Typography variant="h2" weight="bold" color={colors.text} align="center">
+                    <Typography variant="h2" weight="bold" color={colors.text} align="center" style={{width: '100%'}}>
                         Welcome back
                     </Typography>
                     <Typography variant="body" color={colors.textSecondary} align="center">
@@ -143,7 +143,7 @@ export const LoginScreen = () => {
                     <View style={{ height: Spacing.sm }} />
                     {/* Forgot password */}
                     <Pressable
-                        onPress={() => {/* TODO: navigate to forgot password screen */ }}
+                        onPress={() => {router.push('/forgot-password')}}
                         hitSlop={8}
                         style={styles.forgotWrap}
                     >
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: Spacing.xl,
         gap: Spacing.sm,
+        width: '100%'
     },
 
     card: {

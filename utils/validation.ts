@@ -141,6 +141,37 @@ export const forgotPasswordSchema = yup.object({
   email: emailSchema,
 });
 
+/** Forgot password - Dynamic (Email or Phone) */
+export const forgotPasswordDynamicSchema = yup.object({
+  emailOrPhone: yup
+    .string()
+    .required('Email or phone number is required')
+    .test('email-or-phone', 'Enter a valid email or phone number', function (value) {
+      if (!value) return false;
+      
+      const firstChar = value.trim()[0];
+      const startsWithNumber = /[0-9+]/.test(firstChar);
+      
+      // If starts with number/+, validate as phone
+      if (startsWithNumber) {
+        return /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/.test(value);
+      }
+      
+      // Otherwise validate as email
+      return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(value.toLowerCase());
+    }),
+});
+
+/** Reset password (authenticated user) */
+export const resetPasswordSchema = yup.object({
+  oldPassword: yup.string().required('Current password is required'),
+  newPassword: passwordSchema,
+  confirmPassword: yup
+    .string()
+    .required('Please confirm your new password')
+    .oneOf([yup.ref('newPassword')], 'Passwords do not match'),
+});
+
 /** Profile update */
 export const profileSchema = yup.object({
   firstName: nameSchema('First name'),
@@ -157,4 +188,6 @@ export type PasswordCreationFormValues = yup.InferType<typeof passwordCreationSc
 export type RegisterFormValues = yup.InferType<typeof registerSchema>;
 export type LoginFormValues = yup.InferType<typeof loginSchema>;
 export type ForgotPasswordFormValues = yup.InferType<typeof forgotPasswordSchema>;
+export type ForgotPasswordDynamicFormValues = yup.InferType<typeof forgotPasswordDynamicSchema>;
+export type ResetPasswordFormValues = yup.InferType<typeof resetPasswordSchema>;
 export type ProfileFormValues = yup.InferType<typeof profileSchema>;
