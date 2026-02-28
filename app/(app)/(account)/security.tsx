@@ -5,6 +5,7 @@ import { Typography } from '@/components/ui/Typography';
 import { Palette } from '@/constants/colors';
 import { BorderRadius, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
+import { BiometricInfo, BiometricPrefs } from '@/types';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -25,16 +26,6 @@ const SECURE_KEY = 'biometric_prefs_v1';
 
 type AuthType = LocalAuthentication.AuthenticationType;
 const { FINGERPRINT, FACIAL_RECOGNITION, IRIS } = LocalAuthentication.AuthenticationType;
-
-interface BiometricPrefs {
-    [authType: number]: boolean;
-}
-
-interface BiometricInfo {
-    name: string;
-    description: string;
-    icon: string;
-}
 
 const AUTH_TYPE_INFO: Record<number, BiometricInfo> = {
     [FINGERPRINT]: {

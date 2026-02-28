@@ -7,6 +7,9 @@ export default function AuthLayout() {
       <Stack.Screen name="change-phone" />
       <Stack.Screen name="change-email" />
       <Stack.Screen name="delete-account" />
+      <Stack.Screen name="business-settings" />
+      <Stack.Screen name="portfolio-settings" />
+      <Stack.Screen name="profile-settings" />
       <Stack.Screen name="settings" />
     </Stack>
   );

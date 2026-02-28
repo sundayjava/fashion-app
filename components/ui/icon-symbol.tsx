@@ -72,6 +72,8 @@ const MAPPING = {
   'doc.text.fill': 'description',
   'doc.text': 'description',
   'info': 'info',
+  'morehoriz': 'more-horiz',
+  'morevert': 'more-vert',
   // Logout
   'rectangle.portrait.and.arrow.right.fill': 'logout',
   'rectangle.portrait.and.arrow.right': 'logout',

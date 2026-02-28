@@ -1,12 +1,6 @@
+import { Notes } from '@/components/screens/notes'
 import React from 'react'
-import { Text, View } from 'react-native'
 
-const NoteScreen = () => {
-  return (
-    <View>
-      <Text>NoteScreen</Text>
-    </View>
-  )
+export default function NoteScreen() {
+  return <Notes />
 }
-
-export default NoteScreen

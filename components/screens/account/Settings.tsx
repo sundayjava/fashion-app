@@ -5,6 +5,7 @@ import { Typography } from '@/components/ui/Typography';
 import { Palette } from '@/constants/colors';
 import { BorderRadius, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
+import { THEME_OPTIONS } from '@/data/otherdata';
 import {
   accountSettingsData,
   AppearanceSettingsData,
@@ -15,17 +16,10 @@ import {
   SubMenuItem,
   SupportSettingsData,
 } from '@/data/settings';
-import { ThemePreference } from '@/stores/themeStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Linking, Platform, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-
-const THEME_OPTIONS: { label: string; value: ThemePreference; icon: string; desc: string }[] = [
-  { label: 'System', value: 'system', icon: 'gearshape.fill', desc: 'Follows your device setting' },
-  { label: 'Light',  value: 'light',  icon: 'sun.max.fill',  desc: 'Always light mode' },
-  { label: 'Dark',   value: 'dark',   icon: 'moon.fill',     desc: 'Always dark mode' },
-];
 
 // ─── Single settings row ────────────────────────────────────────────
 interface SettingRowProps {
@@ -143,7 +137,7 @@ export const Settings = () => {
         </Typography>
 
         {/* ── Profile card ── */}
-        <TouchableOpacity activeOpacity={0.8} onPress={() => console.log('Navigate to profile')}>
+        <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/profile-settings')}>
           <GlassCard style={{ marginBottom: Spacing.lg }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm }}>
@@ -287,8 +281,9 @@ export const Settings = () => {
                   <Switch
                     value={toggleStates[item.name] ?? true}
                     onValueChange={() => flipToggle(item.name)}
+                    
                     trackColor={{ false: colors.border, true: colors.primary + '10' }}
-                    thumbColor={toggleStates[item.name] ? colors.primary : colors.textTertiary}
+                                    thumbColor={Platform.OS === 'android' ? (true ? Palette.primary : '#f4f3f4') : undefined}
                   />
                 </View>
               ) : (
@@ -355,9 +350,6 @@ export const Settings = () => {
                     style={isSelected ? { color: colors.primary, fontWeight: '600' } : undefined}
                   >
                     {opt.label}
-                  </Typography>
-                  <Typography variant="caption" color={colors.textSecondary}>
-                    {opt.desc}
                   </Typography>
                 </View>
                 {isSelected && (

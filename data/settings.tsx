@@ -24,7 +24,7 @@ export const BusinessSettingsData: SettingsEntry[] = [
     name: 'Business Profile',
     icon: 'briefcase',
     subMenuGroups: [
-      { name: 'Edit Business Info', icon: 'pencil.line', route: '/(app)/(account)/business-info' },
+      { name: 'Edit Business Info', icon: 'pencil.line', route: '/(app)/(account)/business-settings' },
       { name: 'Payment Methods', icon: 'creditcard', route: '/(app)/coming-soon' },
       { name: 'Portfolio Settings', icon: 'photo.on.rectangle', route: '/(app)/(account)/portfolio-settings' },
     ],
