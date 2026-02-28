@@ -1,13 +1,13 @@
 import { BackButton, ControlledInput, GlassButton, GlassCard, Logo, ScreenWrapper, Typography } from '@/components/ui';
 import { appName } from '@/constants/settings';
-import { BorderRadius, Spacing } from '@/constants/theme';
+import { BorderRadius, FontFamily, Spacing } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { loginEmailSchema, loginPhoneSchema } from '@/utils/validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Keyboard, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Platform, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 
 type LoginFormValues = {
     emailOrPhone: string;
@@ -18,6 +18,7 @@ export const LoginScreen = () => {
     const { colors } = useAppTheme();
     const [showPassword, setShowPassword] = useState(false);
     const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email');
+    const {isDark} = useAppTheme();
 
     const {
         control,
@@ -164,6 +165,23 @@ export const LoginScreen = () => {
                 </GlassCard>
             </View>
             </TouchableWithoutFeedback>
+
+            {/* Login link */}
+                    <View style={styles.loginRow}>
+                      <Text
+                        style={[
+                          styles.loginText,
+                          { color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)' },
+                        ]}
+                      >
+                       Doesn&apos;t have an account?{' '}
+                      </Text>
+                      <Pressable onPress={() => router.push('/auth-stack')} hitSlop={8}>
+                        <Text style={[styles.loginLink, { color: isDark ? '#fff' : '#111' }]}>
+                          Sign Up
+                        </Text>
+                      </Pressable>
+                    </View>
         </ScreenWrapper>
     )
 }
@@ -198,4 +216,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 8,
     },
+
+    loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
+      loginText: { fontSize: 14, fontFamily: FontFamily.regular },
+      loginLink: { fontSize: 14, fontFamily: FontFamily.bold },
 })

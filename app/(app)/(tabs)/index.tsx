@@ -1,5 +1,4 @@
 import {
-  AppBottomSheet,
   AppInput,
   AppModal,
   Avatar,
@@ -9,13 +8,12 @@ import {
   GlassButton,
   GlassCard,
   showToast,
-  Typography,
+  Typography
 } from '@/components/ui';
 import { appName } from '@/constants/settings';
 import { Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,7 +21,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
 
   // Bottom Sheet
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -201,39 +198,10 @@ export default function HomeScreen() {
               showToast({ type: 'info', text1: 'FYI', text2: 'Just so you know!' })
             }
           />
-          <GlassButton
-            variant="glass"
-            label="Open Modal Screen"
-            size="sm"
-            style={{ flex: 1 }}
-            onPress={() => router.push('/modal')}
-          />
         </View>
       </View>
 
-      {/* Bottom Sheet */}
-      <AppBottomSheet
-        ref={bottomSheetRef}
-        snapPoints={['45%', '80%']}
-        title="Bottom Sheet"
-        scrollable
-      >
-        <Typography variant="body" color={colors.textSecondary}>
-          This is a gorhom/bottom-sheet with glass background, custom handle, and backdrop.
-        </Typography>
-        <View style={{ gap: Spacing.sm, marginTop: Spacing.lg }}>
-          <AppInput label="Name" placeholder="Your name" />
-          <GlassButton
-            variant="primary"
-            label="Submit"
-            fullWidth
-            onPress={() => {
-              bottomSheetRef.current?.close();
-              showToast({ type: 'success', text1: 'Submitted!' });
-            }}
-          />
-        </View>
-      </AppBottomSheet>
+      
 
       {/* Modal */}
       <AppModal

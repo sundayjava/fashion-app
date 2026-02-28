@@ -1,7 +1,7 @@
 // Fallback for using MaterialIcons on Android and web.
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
+import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
@@ -14,11 +14,68 @@ type IconSymbolName = keyof typeof MAPPING;
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
+  // Navigation
   'house.fill': 'home',
-  'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
-} as IconMapping;
+  'chevron.down': 'expand-more',
+  'chevron.left.forwardslash.chevron.right': 'code',
+  'xmark': 'close',
+  'checkmark': 'check',
+  // Biometrics
+  'faceid': 'face',
+  'touchid': 'fingerprint',
+  'eye.fill': 'visibility',
+  // Tabs
+  'gearshape.fill': 'settings',
+  'person': 'person-outline',
+  'plus': 'add',
+  'note': 'note',
+  'paperplane.fill': 'send',
+  // Account (fill = filled, no fill = outline)
+  'person.fill': 'person',
+  'key.fill': 'vpn-key',
+  'key': 'vpn-key',
+  'lock.fill': 'lock',
+  'lock': 'lock-outline',
+  'shield.fill': 'security',
+  'shield': 'security',
+  'envelope.fill': 'email',
+  'envelope': 'mail-outline',
+  'phone.fill': 'phone',
+  'phone': 'phone',
+  'trash.fill': 'delete',
+  'trash': 'delete-outline',
+  // Business
+  'briefcase.fill': 'work',
+  'briefcase': 'work-outline',
+  'pencil.line': 'edit',
+  'creditcard.fill': 'credit-card',
+  'creditcard': 'credit-card',
+  'photo.on.rectangle': 'burst-mode',
+  // Notifications
+  'bell.fill': 'notifications',
+  'bell': 'notifications-none',
+  'bell.badge.fill': 'notification-important',
+  'bell.badge': 'notification-important',
+  'photo.fill': 'photo',
+  'photo': 'photo',
+  'bag.fill': 'shopping-bag',
+  'bag': 'shopping-bag',
+  // Appearance
+  'paintpalette.fill': 'palette',
+  'paintpalette': 'palette',
+  'sun.max.fill': 'light-mode',
+  'moon.fill': 'dark-mode',
+  // Support
+  'questionmark.circle.fill': 'help',
+  'questionmark.circle': 'help-outline',
+  'doc.text.fill': 'description',
+  'doc.text': 'description',
+  'info': 'info',
+  // Logout
+  'rectangle.portrait.and.arrow.right.fill': 'logout',
+  'rectangle.portrait.and.arrow.right': 'logout',
+} as unknown as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

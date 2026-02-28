@@ -110,7 +110,7 @@ export const EmailPhone = () => {
   return (
     <ScreenWrapper
       padded
-      keyboardAvoiding
+      keyboardAvoiding 
       keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
       style={{ paddingVertical: Spacing.md }}
     >

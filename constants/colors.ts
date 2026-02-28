@@ -18,7 +18,6 @@ export const Palette = {
   midGray: '#AEAEAE',
   darkGray: '#4A4A4A',
   black: '#000000',
-  textDark: '#333333',
 
   // Status
   success: '#22C55E',
@@ -47,7 +46,7 @@ export const ThemeColors: Record<ColorScheme, AppThemeColors> = {
     background: Palette.white,
     surface: Palette.offWhite,
     surfaceElevated: Palette.white,
-    text: Palette.textDark,
+    text: Palette.black,
     textSecondary: Palette.darkGray,
     textTertiary: Palette.midGray,
     textInverse: Palette.white,

@@ -1,19 +1,19 @@
-import React from 'react';
-import {
-  Modal,
-  ModalProps,
-  View,
-  Pressable,
-  StyleSheet,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { BlurView } from 'expo-blur';
 import { BorderRadius, Shadow, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
-import { Typography } from './Typography';
+import { BlurView } from 'expo-blur';
+import React from 'react';
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  ModalProps,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { GlassButton } from './GlassButton';
+import { Typography } from './Typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -151,14 +151,14 @@ export function ConfirmModal({
       footer={
         <View style={styles.confirmFooter}>
           <GlassButton
-            variant="outline"
+            variant="glass"
             label={cancelLabel}
             size="md"
             onPress={onClose}
             style={{ flex: 1 }}
           />
           <GlassButton
-            variant={destructive ? 'accent' : 'primary'}
+            variant= 'glass'
             label={confirmLabel}
             size="md"
             onPress={() => {
@@ -219,5 +219,6 @@ const styles = StyleSheet.create({
   confirmFooter: {
     flexDirection: 'row',
     gap: Spacing.sm,
+    marginTop: Spacing.lg,
   },
 });
