@@ -1,6 +1,7 @@
 import { AppToastHost, buildToastConfig } from '@/components/ui/Toast';
 import { NavigationDarkTheme, NavigationLightTheme } from '@/constants/theme';
 import { AppThemeProvider, useAppTheme } from '@/context/ThemeContext';
+import { dbService } from '@/services/database';
 import { initSentry } from '@/services/sentry';
 import {
   RedditSans_400Regular,
@@ -64,6 +65,20 @@ function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  // Initialize database
+  useEffect(() => {
+    const initializeServices = async () => {
+      try {
+        await dbService.initialize();
+        // Note: Notification service is initialized lazily only when needed
+        // to avoid Expo Go errors on Android
+      } catch (error) {
+        console.error('Failed to initialize services:', error);
+      }
+    };
+    initializeServices();
+  }, []);
 
   if (!fontsLoaded && !fontError) {
     return null;

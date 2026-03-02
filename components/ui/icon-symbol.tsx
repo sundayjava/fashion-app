@@ -66,6 +66,13 @@ const MAPPING = {
   'paintpalette': 'palette',
   'sun.max.fill': 'light-mode',
   'moon.fill': 'dark-mode',
+  // Measurements & Lists
+  'ruler': 'straighten',
+  'list.bullet': 'list',
+  'square.and.arrow.down': 'save',
+  'square.and.arrow.up': 'upload',
+  'arrow.counterclockwise': 'restore',
+  'calendar': 'event',
   // Support
   'questionmark.circle.fill': 'help',
   'questionmark.circle': 'help-outline',
@@ -74,6 +81,10 @@ const MAPPING = {
   'info': 'info',
   'morehoriz': 'more-horiz',
   'morevert': 'more-vert',
+  'ellipsis': 'more-vert',
+  'ellipsis.vertical': 'more-vert',
+  'ellipsis.horizontal': 'more-horiz',
+  'line.3.horizontal': 'drag-handle',
   // Logout
   'rectangle.portrait.and.arrow.right.fill': 'logout',
   'rectangle.portrait.and.arrow.right': 'logout',

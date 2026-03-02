@@ -1,4 +1,4 @@
-import { AppModal, BackButton, GlassButton, GlassCard, ScreenWrapper, Typography } from "@/components/ui";
+import { AppBottomSheet, AppModal, BackButton, GlassButton, ScreenWrapper, Typography } from "@/components/ui";
 import { DropdownMenu } from "@/components/ui/DropdownMenu";
 import { FAB } from "@/components/ui/FAB";
 import { AppInput } from "@/components/ui/Input";
@@ -7,17 +7,21 @@ import { Palette } from "@/constants/colors";
 import { BorderRadius, Spacing } from "@/constants/spacing";
 import { useAppTheme } from "@/context/ThemeContext";
 import { MENU_ITEMS, PRESET_FIELDS, UNITS } from "@/data/otherdata";
+import { dbService } from "@/services/database";
+import { useMeasurementStore } from "@/stores/measurementStore";
 import { MeasurementField } from "@/types";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+    FlatList,
     Platform,
-    ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 function UnitChip({ unit, onPress }: { unit: string; onPress: () => void }) {
     return (
@@ -41,17 +45,36 @@ function MeasurementRow({
     unit,
     onValueChange,
     onRemove,
+    isLast,
+    onSubmitEditing,
+    onRefReady,
 }: {
     field: MeasurementField;
     unit: string;
     onValueChange: (id: string, value: string) => void;
     onRemove: (id: string) => void;
+    isLast?: boolean;
+    onSubmitEditing?: () => void;
+    onRefReady?: (ref: TextInput | null) => void;
 }) {
     const { colors } = useAppTheme();
     const inputRef = useRef<TextInput>(null);
 
+    // Register ref when component mounts
+    useEffect(() => {
+        if (inputRef.current && onRefReady) {
+            onRefReady(inputRef.current);
+        }
+    }, [onRefReady]);
+
     return (
-        <View style={[styles.measureRow, { borderBottomColor: colors.border }]}>
+        <View style={[
+            styles.measureRow,
+            {
+                borderBottomColor: colors.border,
+                backgroundColor: 'transparent',
+            }
+        ]}>
             <Typography variant="body" color={colors.text} style={styles.measureLabel} numberOfLines={1}>
                 {field.name}
             </Typography>
@@ -65,7 +88,9 @@ function MeasurementRow({
                     placeholderTextColor={colors.textTertiary}
                     style={[styles.measureInput, { color: colors.text, borderColor: colors.border }]}
                     selectTextOnFocus
-                    returnKeyType="next"
+                    returnKeyType={isLast ? "done" : "next"}
+                    onSubmitEditing={onSubmitEditing}
+                    blurOnSubmit={false}
                 />
                 <Typography variant="caption" color={colors.textSecondary} style={styles.measureUnit}>
                     {unit}
@@ -99,49 +124,224 @@ function EmptyState() {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export const AddNotes = () => {
+export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
     const router = useRouter();
     const { colors, isDark } = useAppTheme();
 
-    const moreButtonRef = useRef<View>(null);
+    // Zustand store
+    const { fields, unit, setFields, addField, removeField, updateFieldValue, setUnit, fieldExists, reset } = useMeasurementStore();
 
-    const [unit, setUnit] = useState<string>('in');
-    const [fields, setFields] = useState<MeasurementField[]>([]);
+    const moreButtonRef = useRef<View>(null);
+    const presetBottomSheetRef = useRef<BottomSheet>(null);
+    const inputRefs = useRef<Map<string, TextInput>>(new Map());
 
     const [unitOpen, setUnitOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [customOpen, setCustomOpen] = useState(false);
-    const [presetOpen, setPresetOpen] = useState(false);
+    const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+
     const [customName, setCustomName] = useState('');
+    const [templateName, setTemplateName] = useState('');
+
+    // Load measurement data for editing or default template for new measurement
+    useEffect(() => {
+        const initializeData = async () => {
+            if (measurementId) {
+                // Editing existing measurement
+                await loadMeasurementForEdit(measurementId);
+                setIsEditing(true);
+            } else {
+                // Creating new measurement - load default template if no fields in store
+                if (fields.length === 0) {
+                    await loadDefaultTemplate();
+                }
+            }
+        };
+        initializeData();
+
+        // Cleanup: reset store when leaving the screen (only for new measurements)
+        return () => {
+            if (!measurementId) {
+                reset();
+            }
+        };
+    }, [measurementId]);
+
+    // ── Database operations ───────────────────────────────────────────────────
+
+    const loadMeasurementForEdit = async (id: number) => {
+        try {
+            const measurement = await dbService.getMeasurement(id);
+            if (measurement) {
+                const parsedFields: MeasurementField[] = JSON.parse(measurement.fields);
+                setFields(parsedFields);
+                setUnit(measurement.unit);
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Not found',
+                    text2: 'Measurement not found',
+                });
+                router.back();
+            }
+        } catch (error) {
+            console.error('Failed to load measurement:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to load measurement',
+            });
+            router.back();
+        }
+    };
+
+    const loadDefaultTemplate = async () => {
+        try {
+            const template = await dbService.getDefaultTemplate();
+            if (template) {
+                const fieldNames = JSON.parse(template.fields);
+                const newFields = fieldNames.map((name: string) => ({
+                    id: Date.now().toString() + Math.random(),
+                    name,
+                    value: '',
+                }));
+                setFields(newFields);
+            }
+        } catch (error) {
+            console.error('Failed to load default template:', error);
+        }
+    };
+
+    const saveTemplateToDb = async () => {
+        if (!templateName.trim()) return;
+        try {
+            await dbService.saveTemplate(templateName.trim(), fields);
+            Toast.show({
+                type: 'success',
+                text1: 'Template saved',
+                text2: `"${templateName}" saved successfully`,
+            });
+            setTemplateName('');
+            setSaveTemplateOpen(false);
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.message || 'Failed to save template',
+            });
+        }
+    };
+
+    const restoreDefault = () => {
+        const defaultFields = PRESET_FIELDS.slice(0, 5).map((name) => ({
+            id: Date.now().toString() + Math.random(),
+            name,
+            value: '',
+        }));
+        setFields(defaultFields);
+        Toast.show({
+            type: 'success',
+            text1: 'Restored default',
+            text2: 'Default fields have been restored',
+        });
+    };
 
     // ── Field helpers ─────────────────────────────────────────────────────────
-    const addField = (name: string) => {
+    const handleAddField = (name: string) => {
         const trimmed = name.trim();
         if (!trimmed) return;
-        setFields((prev) => [...prev, { id: Date.now().toString(), name: trimmed, value: '' }]);
+
+        // Check for duplicate names
+        if (fieldExists(trimmed)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Duplicate field',
+                text2: `"${trimmed}" already exists`,
+            });
+            return;
+        }
+
+        addField(trimmed);
     };
 
     const addPreset = (name: string) => {
-        if (!fields.find((f) => f.name === name)) addField(name);
-    };
-
-    const updateValue = (id: string, value: string) => {
-        setFields((prev) => prev.map((f) => (f.id === id ? { ...f, value } : f)));
-    };
-
-    const removeField = (id: string) => {
-        setFields((prev) => prev.filter((f) => f.id !== id));
+        if (fieldExists(name)) {
+            Toast.show({
+                type: 'info',
+                text1: 'Already added',
+                text2: `"${name}" is already in your list`,
+            });
+            return;
+        }
+        addField(name);
     };
 
     const handleAddCustom = () => {
-        addField(customName);
+        handleAddField(customName);
         setCustomName('');
         setCustomOpen(false);
     };
 
     const handleMenuSelect = (id: string) => {
-        // TODO: wire up actions
-        console.log('menu:', id);
+        switch (id) {
+            case 'save_template':
+                if (fields.length === 0) {
+                    Toast.show({
+                        type: 'info',
+                        text1: 'No fields',
+                        text2: 'Add at least one field to save as template',
+                    });
+                    return;
+                }
+                setSaveTemplateOpen(true);
+                break;
+            case 'load_template':
+                router.push('/(app)/(notes)/load-template');
+                break;
+            case 'restore_default':
+                restoreDefault();
+                break;
+            case 'help':
+                Toast.show({
+                    type: 'info',
+                    text1: 'Help',
+                    text2: 'Tap the + button to add custom fields or use presets',
+                });
+                break;
+        }
+    };
+
+    const renderMeasurementItem = ({ item, index }: { item: MeasurementField; index: number }) => {
+        const isLast = index === fields.length - 1;
+        
+        const focusNextField = () => {
+            if (!isLast) {
+                const nextField = fields[index + 1];
+                const nextInput = inputRefs.current.get(nextField.id);
+                nextInput?.focus();
+            }
+        };
+
+        const registerRef = (ref: TextInput | null) => {
+            if (ref) {
+                inputRefs.current.set(item.id, ref);
+            } else {
+                inputRefs.current.delete(item.id);
+            }
+        };
+
+        return (
+            <MeasurementRow
+                field={item}
+                unit={unit}
+                onValueChange={updateFieldValue}
+                onRemove={removeField}
+                isLast={isLast}
+                onSubmitEditing={focusNextField}
+                onRefReady={registerRef}
+            />
+        );
     };
 
     const selectedUnitLabel = UNITS.find((u) => u.value === unit)?.value ?? unit;
@@ -152,13 +352,29 @@ export const AddNotes = () => {
             keyboardAvoiding
             keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
         >
-            <View style={[styles.container, { paddingHorizontal: Spacing.md, paddingTop: Spacing.sm }]}>
+            <View style={[styles.container, { paddingTop: Spacing.sm }]}>
 
                 {/* ── Header ── */}
                 <View style={styles.header}>
                     <BackButton onPress={() => router.back()} />
-                    <Typography variant="h4">Measurement</Typography>
+                    <Typography variant="h4">{isEditing ? 'Edit' : 'Measurement'}</Typography>
                     <View style={styles.headerRight}>
+                        {fields.length > 0 && (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    const url = measurementId 
+                                        ? `/(app)/(notes)/save-measurement?id=${measurementId}`
+                                        : '/(app)/(notes)/save-measurement';
+                                    router.push(url as any);
+                                }}
+                                style={[styles.saveBtn, { backgroundColor: Palette.primary }]}
+                                activeOpacity={0.8}
+                            >
+                                <Typography variant="caption" weight="semiBold" color="#fff">
+                                    {isEditing ? 'Update' : 'Save'}
+                                </Typography>
+                            </TouchableOpacity>
+                        )}
                         <UnitChip unit={selectedUnitLabel} onPress={() => setUnitOpen(true)} />
                         {/* anchor ref so the dropdown knows where to position itself */}
                         <View ref={moreButtonRef} collapsable={false}>
@@ -168,44 +384,35 @@ export const AddNotes = () => {
                                 style={styles.iconBtn}
                                 activeOpacity={0.7}
                             >
-                                <IconSymbol size={24} name={'morevert' as any} color={colors.text} />
+                                <IconSymbol size={24} name="ellipsis" color={colors.text} />
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
                 {/* ── Field List ── */}
-                <ScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={[
-                        styles.listContent,
-                        fields.length === 0 && { flex: 1 },
-                    ]}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                >
-                    {fields.length === 0 ? (
+                {fields.length === 0 ? (
+                    <View style={{ flex: 1 }}>
                         <EmptyState />
-                    ) : (
-                        <GlassCard style={{ padding: 0, overflow: 'hidden' }}>
-                            {fields.map((field) => (
-                                <MeasurementRow
-                                    key={field.id}
-                                    field={field}
-                                    unit={unit}
-                                    onValueChange={updateValue}
-                                    onRemove={removeField}
-                                />
-                            ))}
-                        </GlassCard>
-                    )}
-                </ScrollView>
+                    </View>
+                ) : (
+                    <View style={{ flex: 1, paddingHorizontal: Spacing.xs}}>
+                        <FlatList
+                            data={fields}
+                            renderItem={renderMeasurementItem}
+                            keyExtractor={(item) => item.id}
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="handled"
+                        />
+                    </View>
+                )}
 
                 {/* ── FABs (bottom-right, stacked) ── */}
                 <View style={styles.fabGroup}>
                     <FAB
                         icon="list.bullet"
-                        onPress={() => setPresetOpen(true)}
+                        onPress={() => presetBottomSheetRef.current?.snapToIndex(0)}
                         color={isDark ? '#3a3a3a' : Palette.primaryDark}
                         size={48}
                     />
@@ -287,51 +494,68 @@ export const AddNotes = () => {
                 />
             </AppModal>
 
-            {/* ── Preset Field Modal ── */}
-            <AppModal
-                visible={presetOpen}
-                onClose={() => setPresetOpen(false)}
+            {/* ── Preset Field Bottom Sheet ── */}
+            <AppBottomSheet
+                ref={presetBottomSheetRef}
+                snapPoints={['50%', '75%']}
                 title="Add Preset Field"
-                description="Tap a field to add it"
-                size="lg"
+                scrollable
             >
-                <ScrollView style={{ maxHeight: 340 }} showsVerticalScrollIndicator={false}>
-                    <View style={styles.presetGrid}>
-                        {PRESET_FIELDS.map((name) => {
-                            const added = !!fields.find((f) => f.name === name);
-                            return (
-                                <TouchableOpacity
-                                    key={name}
-                                    onPress={() => addPreset(name)}
-                                    disabled={added}
-                                    activeOpacity={0.7}
-                                    style={[
-                                        styles.presetChip,
-                                        added
-                                            ? { backgroundColor: Palette.primary + '18', borderColor: Palette.primary }
-                                            : { backgroundColor: colors.surface, borderColor: colors.border },
-                                    ]}
+                <View style={styles.presetGrid}>
+                    {PRESET_FIELDS.map((name) => {
+                        const added = !!fields.find((f) => f.name === name);
+                        return (
+                            <TouchableOpacity
+                                key={name}
+                                onPress={() => addPreset(name)}
+                                disabled={added}
+                                activeOpacity={0.7}
+                                style={[
+                                    styles.presetChip,
+                                    added
+                                        ? { backgroundColor: Palette.primary + '18', borderColor: Palette.primary }
+                                        : { backgroundColor: colors.surface, borderColor: colors.border },
+                                ]}
+                            >
+                                {added && (
+                                    <IconSymbol size={12} name="checkmark" color={Palette.primary} style={{ marginRight: 4 }} />
+                                )}
+                                <Typography
+                                    variant="caption"
+                                    color={added ? Palette.primary : colors.text}
+                                    weight={added ? 'semiBold' : 'regular'}
                                 >
-                                    {added && (
-                                        <IconSymbol size={12} name="checkmark" color={Palette.primary} style={{ marginRight: 4 }} />
-                                    )}
-                                    <Typography
-                                        variant="caption"
-                                        color={added ? Palette.primary : colors.text}
-                                        weight={added ? 'semiBold' : 'regular'}
-                                    >
-                                        {name}
-                                    </Typography>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-                </ScrollView>
+                                    {name}
+                                </Typography>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </View>
+            </AppBottomSheet>
+
+            {/* ── Save Template Modal ── */}
+            <AppModal
+                visible={saveTemplateOpen}
+                onClose={() => { setSaveTemplateOpen(false); setTemplateName(''); }}
+                title="Save Template"
+                description="Give your template a name"
+                size="md"
+            >
+                <AppInput
+                    placeholder="e.g. Shirt measurements"
+                    value={templateName}
+                    onChangeText={setTemplateName}
+                    onSubmitEditing={saveTemplateToDb}
+                    returnKeyType="done"
+                    autoFocus
+                    autoCapitalize="words"
+                />
                 <GlassButton
                     variant="primary"
-                    label="Done"
+                    label="Save Template"
                     fullWidth
-                    onPress={() => setPresetOpen(false)}
+                    onPress={saveTemplateToDb}
+                    disabled={!templateName.trim() || fields.length === 0}
                     style={{ marginTop: Spacing.md }}
                 />
             </AppModal>
@@ -350,6 +574,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: Spacing.md,
+        paddingHorizontal: Spacing.md,
     },
     headerRight: {
         flexDirection: 'row',
@@ -442,5 +667,32 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderRadius: BorderRadius.full,
         borderWidth: 1,
+    },
+    saveBtn: {
+        paddingHorizontal: Spacing.md,
+        paddingVertical: 6,
+        borderRadius: BorderRadius.full,
+    },
+    datePickerBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: Spacing.sm + 2,
+        borderRadius: BorderRadius.md,
+        borderWidth: 1,
+        gap: Spacing.sm,
+    },
+    notesInput: {
+        padding: Spacing.sm + 2,
+        borderRadius: BorderRadius.md,
+        borderWidth: 1,
+        fontSize: 15,
+        textAlignVertical: 'top',
+        minHeight: 80,
+    },
+    summaryCard: {
+        padding: Spacing.sm + 2,
+        borderRadius: BorderRadius.md,
+        borderWidth: 1,
+        alignItems: 'center',
     },
 });
