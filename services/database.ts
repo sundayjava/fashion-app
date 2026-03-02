@@ -11,6 +11,7 @@ import * as SQLite from 'expo-sqlite';
 export interface MeasurementRecord {
     id: number;
     clientName: string;
+    address?: string; // Client address
     unit: string;
     fields: string; // JSON stringified array of MeasurementField[]
     imageUri?: string; // Local file URI for cloth image
@@ -43,7 +44,7 @@ export interface TemplateRecord {
 
 class DatabaseService {
     private db: SQLite.SQLiteDatabase | null = null;
-    private readonly DB_VERSION = 2; // Increment when schema changes
+    private readonly DB_VERSION = 1; // Increment when schema changes
 
     /**
      * Initialize the database and create tables if they don't exist
@@ -139,6 +140,7 @@ class DatabaseService {
             CREATE TABLE IF NOT EXISTS measurements (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 clientName TEXT NOT NULL,
+                address TEXT,
                 unit TEXT NOT NULL DEFAULT 'in',
                 fields TEXT NOT NULL,
                 imageUri TEXT,
@@ -193,9 +195,9 @@ class DatabaseService {
             return;
         }
 
-        // Migration from version 0 or 1 to version 2: Add new columns to measurements table
+        // Migration from version 0, 1, or 2 to version 3: Add new columns to measurements table
         // Version 0 = legacy database without version tracking
-        if (fromVersion < 2) {
+        if (fromVersion < 3) {
             try {
                 console.log('🔍 Checking measurements table schema...');
                 // Check if columns exist before adding them
@@ -241,8 +243,13 @@ class DatabaseService {
                     await this.db!.execAsync('ALTER TABLE measurements ADD COLUMN imageUri TEXT;');
                     console.log('✓ Added imageUri column');
                 }
+                if (!columnNames.includes('address')) {
+                    console.log('➕ Adding address column...');
+                    await this.db!.execAsync('ALTER TABLE measurements ADD COLUMN address TEXT;');
+                    console.log('✓ Added address column');
+                }
 
-                console.log('✅ Migration to version 2 completed');
+                console.log('✅ Migration to version 3 completed');
             } catch (error) {
                 console.error('❌ Migration error:', error);
                 throw error;
@@ -269,6 +276,7 @@ class DatabaseService {
         fields: MeasurementField[],
         unit: string,
         clientName: string,
+        address?: string,
         reminderDate?: string,
         notes?: string,
         imageUri?: string,
@@ -282,17 +290,17 @@ class DatabaseService {
             // Update existing
             await db.runAsync(
                 `UPDATE measurements 
-                 SET fields = ?, unit = ?, clientName = ?, reminderDate = ?, notes = ?, imageUri = ?, updatedAt = ?, syncStatus = ?
+                 SET fields = ?, unit = ?, clientName = ?, address = ?, reminderDate = ?, notes = ?, imageUri = ?, updatedAt = ?, syncStatus = ?
                  WHERE id = ?`,
-                [fieldsJson, unit, clientName, reminderDate || null, notes || null, imageUri || null, now, 'pending', id]
+                [fieldsJson, unit, clientName, address || null, reminderDate || null, notes || null, imageUri || null, now, 'pending', id]
             );
             return id;
         } else {
             // Insert new
             const result = await db.runAsync(
-                `INSERT INTO measurements (fields, unit, clientName, reminderDate, notes, imageUri, createdAt, updatedAt, syncStatus, isCompleted)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [fieldsJson, unit, clientName, reminderDate || null, notes || null, imageUri || null, now, now, 'pending', 0]
+                `INSERT INTO measurements (fields, unit, clientName, address, reminderDate, notes, imageUri, createdAt, updatedAt, syncStatus, isCompleted)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [fieldsJson, unit, clientName, address || null, reminderDate || null, notes || null, imageUri || null, now, now, 'pending', 0]
             );
             return result.lastInsertRowId;
         }

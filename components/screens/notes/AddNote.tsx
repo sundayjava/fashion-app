@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
     FlatList,
+    KeyboardAvoidingView,
     Platform,
     StyleSheet,
     TextInput,
@@ -92,12 +93,9 @@ function MeasurementRow({
                     onSubmitEditing={onSubmitEditing}
                     blurOnSubmit={false}
                 />
-                <Typography variant="caption" color={colors.textSecondary} style={styles.measureUnit}>
-                    {unit}
-                </Typography>
             </View>
-            <TouchableOpacity onPress={() => onRemove(field.id)} hitSlop={8} style={{ marginLeft: Spacing.xs }}>
-                <IconSymbol size={18} name="xmark" color={colors.textTertiary} />
+            <TouchableOpacity onPress={() => onRemove(field.id)} hitSlop={8} style={{ marginLeft: Spacing.md }}>
+                <IconSymbol size={18} name="trash" color={colors.textTertiary} />
             </TouchableOpacity>
         </View>
     );
@@ -143,6 +141,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
 
     const [customName, setCustomName] = useState('');
     const [templateName, setTemplateName] = useState('');
+    const [presetSearchQuery, setPresetSearchQuery] = useState('');
 
     // Load measurement data for editing or default template for new measurement
     useEffect(() => {
@@ -349,8 +348,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
     return (
         <ScreenWrapper
             padded={false}
-            keyboardAvoiding
-            keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
+            keyboardAvoiding={false}
         >
             <View style={[styles.container, { paddingTop: Spacing.sm }]}>
 
@@ -377,7 +375,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
                         )}
                         <UnitChip unit={selectedUnitLabel} onPress={() => setUnitOpen(true)} />
                         {/* anchor ref so the dropdown knows where to position itself */}
-                        <View ref={moreButtonRef} collapsable={false}>
+                        {!isEditing && <View ref={moreButtonRef} collapsable={false}>
                             <TouchableOpacity
                                 onPress={() => setMenuOpen(true)}
                                 hitSlop={8}
@@ -386,7 +384,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
                             >
                                 <IconSymbol size={24} name="ellipsis" color={colors.text} />
                             </TouchableOpacity>
-                        </View>
+                        </View>}
                     </View>
                 </View>
 
@@ -396,23 +394,30 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
                         <EmptyState />
                     </View>
                 ) : (
-                    <View style={{ flex: 1, paddingHorizontal: Spacing.xs}}>
+                    <KeyboardAvoidingView 
+                        style={{ flex: 1, paddingHorizontal: Spacing.xs }}
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+                    >
                         <FlatList
                             data={fields}
                             renderItem={renderMeasurementItem}
                             keyExtractor={(item) => item.id}
-                            contentContainerStyle={{ flexGrow: 1 }}
+                            contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
                         />
-                    </View>
+                    </KeyboardAvoidingView>
                 )}
 
                 {/* ── FABs (bottom-right, stacked) ── */}
                 <View style={styles.fabGroup}>
                     <FAB
                         icon="list.bullet"
-                        onPress={() => presetBottomSheetRef.current?.snapToIndex(0)}
+                        onPress={() => {
+                            setPresetSearchQuery(''); // Clear search when opening
+                            presetBottomSheetRef.current?.snapToIndex(0);
+                        }}
                         color={isDark ? '#3a3a3a' : Palette.primaryDark}
                         size={48}
                     />
@@ -501,35 +506,61 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
                 title="Add Preset Field"
                 scrollable
             >
+                {/* Search Input */}
+                <View style={{ marginBottom: Spacing.md }}>
+                    <AppInput
+                        placeholder="Search preset fields..."
+                        value={presetSearchQuery}
+                        onChangeText={setPresetSearchQuery}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                </View>
+
                 <View style={styles.presetGrid}>
-                    {PRESET_FIELDS.map((name) => {
-                        const added = !!fields.find((f) => f.name === name);
-                        return (
-                            <TouchableOpacity
-                                key={name}
-                                onPress={() => addPreset(name)}
-                                disabled={added}
-                                activeOpacity={0.7}
-                                style={[
-                                    styles.presetChip,
-                                    added
-                                        ? { backgroundColor: Palette.primary + '18', borderColor: Palette.primary }
-                                        : { backgroundColor: colors.surface, borderColor: colors.border },
-                                ]}
-                            >
-                                {added && (
-                                    <IconSymbol size={12} name="checkmark" color={Palette.primary} style={{ marginRight: 4 }} />
-                                )}
-                                <Typography
-                                    variant="caption"
-                                    color={added ? Palette.primary : colors.text}
-                                    weight={added ? 'semiBold' : 'regular'}
+                    {PRESET_FIELDS.filter((name) => 
+                        name.toLowerCase().includes(presetSearchQuery.toLowerCase())
+                    ).length === 0 ? (
+                        <View style={{ alignItems: 'center', paddingVertical: Spacing.xl }}>
+                            <Typography variant="body" color={colors.textSecondary}>
+                                No preset fields found
+                            </Typography>
+                            <Typography variant="caption" color={colors.textTertiary} style={{ marginTop: Spacing.xs }}>
+                                Try a different search term
+                            </Typography>
+                        </View>
+                    ) : (
+                        PRESET_FIELDS.filter((name) => 
+                            name.toLowerCase().includes(presetSearchQuery.toLowerCase())
+                        ).map((name) => {
+                            const added = !!fields.find((f) => f.name === name);
+                            return (
+                                <TouchableOpacity
+                                    key={name}
+                                    onPress={() => addPreset(name)}
+                                    disabled={added}
+                                    activeOpacity={0.7}
+                                    style={[
+                                        styles.presetChip,
+                                        added
+                                            ? { backgroundColor: Palette.primary + '18', borderColor: Palette.primary }
+                                            : { backgroundColor: colors.surface, borderColor: colors.border },
+                                    ]}
                                 >
-                                    {name}
-                                </Typography>
-                            </TouchableOpacity>
-                        );
-                    })}
+                                    {added && (
+                                        <IconSymbol size={12} name="checkmark" color={Palette.primary} style={{ marginRight: 4 }} />
+                                    )}
+                                    <Typography
+                                        variant="caption"
+                                        color={added ? Palette.primary : colors.text}
+                                        weight={added ? 'semiBold' : 'regular'}
+                                    >
+                                        {name}
+                                    </Typography>
+                                </TouchableOpacity>
+                            );
+                        })
+                    )}
                 </View>
             </AppBottomSheet>
 
@@ -618,7 +649,7 @@ const styles = StyleSheet.create({
         width: 72,
         textAlign: 'right',
         paddingHorizontal: Spacing.sm,
-        paddingVertical: 6,
+        paddingVertical: 8,
         borderRadius: BorderRadius.sm,
         borderWidth: 1,
         fontSize: 15,

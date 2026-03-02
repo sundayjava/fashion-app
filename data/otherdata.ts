@@ -102,7 +102,7 @@ export const PRESET_FIELDS = [
 
 export const MENU_ITEMS: DropdownMenuItem[] = [
     { id: 'save_template', label: 'Save template', icon: 'square.and.arrow.down' },
-    { id: 'load_template', label: 'Load template', icon: 'square.and.arrow.up' },
+    { id: 'load_template', label: 'Use template', icon: 'square.and.arrow.up' },
     { id: 'restore_default', label: 'Restore default', icon: 'arrow.counterclockwise' },
     { id: 'help', label: 'Help', icon: 'questionmark.circle' },
 ];

@@ -124,9 +124,9 @@ export default function LoadTemplateScreen() {
                     {
                         backgroundColor: colors.surface,
                         borderColor: colors.border,
-                    },
-                ]}
-            >
+                    }
+                ]}>
+                    
                 <View style={{ flex: 1 }}>
                     <Typography variant="body" weight="semiBold" color={colors.text}>
                         {item.name}
@@ -134,13 +134,6 @@ export default function LoadTemplateScreen() {
                     <Typography variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
                         {fieldCount} field{fieldCount !== 1 ? 's' : ''}
                     </Typography>
-                    {item.isDefault && (
-                        <View style={[styles.defaultBadge, { backgroundColor: Palette.primary + '18' }]}>
-                            <Typography variant="caption" weight="semiBold" color={Palette.primary}>
-                                Default
-                            </Typography>
-                        </View>
-                    )}
                 </View>
                 <View style={styles.actionButtons}>
                     <TouchableOpacity
@@ -179,7 +172,7 @@ export default function LoadTemplateScreen() {
                 {/* Header */}
                 <View style={styles.header}>
                     <BackButton onPress={() => router.back()} />
-                    <Typography variant="h4">Load Template</Typography>
+                    <Typography variant="h4">Template</Typography>
                     <View style={{ width: 40 }} />
                 </View>
 

@@ -34,6 +34,7 @@ export default function SaveMeasurementScreen() {
     const { fields, unit, reset } = useMeasurementStore();
 
     const [clientName, setClientName] = useState('');
+    const [address, setAddress] = useState('');
     const [reminderDate, setReminderDate] = useState<Date | undefined>();
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [notes, setNotes] = useState('');
@@ -54,6 +55,7 @@ export default function SaveMeasurementScreen() {
             const measurement = await dbService.getMeasurement(id);
             if (measurement) {
                 setClientName(measurement.clientName);
+                setAddress(measurement.address || '');
                 setNotes(measurement.notes || '');
                 setImageUri(measurement.imageUri);
                 if (measurement.reminderDate) {
@@ -199,6 +201,7 @@ export default function SaveMeasurementScreen() {
                 fields,
                 unit,
                 clientName.trim(),
+                address.trim() || undefined,
                 reminderDate?.toISOString(),
                 notes.trim() || undefined,
                 imageUri,
@@ -279,6 +282,20 @@ export default function SaveMeasurementScreen() {
                                 value={clientName}
                                 onChangeText={setClientName}
                                 autoFocus
+                                autoCapitalize="words"
+                                returnKeyType="next"
+                            />
+                        </View>
+
+                        {/* Address */}
+                        <View style={styles.section}>
+                            <Typography variant="body" weight="semiBold" style={styles.label}>
+                                Address (Optional)
+                            </Typography>
+                            <AppInput
+                                placeholder="e.g. NO52, Balogun Street"
+                                value={address}
+                                onChangeText={setAddress}
                                 autoCapitalize="words"
                                 returnKeyType="next"
                             />

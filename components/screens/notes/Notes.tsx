@@ -11,11 +11,12 @@ import {
     Alert,
     FlatList,
     Image,
+    Modal,
     Platform,
     RefreshControl,
     StyleSheet,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -27,6 +28,7 @@ export const Notes = () => {
     const [sharedMeasurements, setSharedMeasurements] = useState<MeasurementRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     // Load measurements when screen comes into focus
     useFocusEffect(
@@ -98,6 +100,26 @@ export const Notes = () => {
         );
     };
 
+    const handleToggleComplete = async (measurement: MeasurementRecord, e: any) => {
+        e.stopPropagation(); // Prevent opening edit screen
+
+        try {
+            await dbService.markMeasurementComplete(measurement.id, !measurement.isCompleted);
+            Toast.show({
+                type: 'success',
+                text1: measurement.isCompleted ? 'Marked as incomplete' : 'Marked as complete',
+                text2: `${measurement.clientName}`,
+            });
+            loadMeasurements();
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to update status',
+            });
+        }
+    };
+
     const renderMeasurementCard = ({ item }: { item: MeasurementRecord }) => {
         const fields: MeasurementField[] = JSON.parse(item.fields);
         const fieldCount = fields.length;
@@ -116,63 +138,110 @@ export const Notes = () => {
                     },
                 ]}
             >
-                <View style={styles.cardContent}>
-                    <View style={styles.cardHeader}>
-                        <View style={{ flex: 1 }}>
-                            <Typography variant="body" weight="semiBold" color={colors.text}>
-                                {item.clientName}
-                            </Typography>
-                            <Typography variant="caption" color={colors.textSecondary} style={{ marginTop: 2 }}>
-                                {filledCount}/{fieldCount} fields • {item.unit}
-                            </Typography>
-                        </View>
-                        {isCompleted && (
-                            <View style={[styles.badge, { backgroundColor: Palette.success + '18' }]}>
-                                <IconSymbol size={12} name="checkmark" color={Palette.success} />
-                                <Typography variant="caption" weight="semiBold" color={Palette.success}>
-                                    Done
-                                </Typography>
-                            </View>
-                        )}
-                    </View>
-
+                <View style={styles.cardLayout}>
+                    {/* Image on the left */}
                     {item.imageUri && (
-                        <Image
-                            source={{ uri: item.imageUri }}
-                            style={styles.cardImage}
-                            resizeMode="cover"
-                        />
-                    )}
-
-                    {item.notes && (
-                        <Typography
-                            variant="caption"
-                            color={colors.textSecondary}
-                            style={{ marginTop: Spacing.xs }}
-                            numberOfLines={2}
-                        >
-                            {item.notes}
-                        </Typography>
-                    )}
-
-                    <View style={styles.cardFooter}>
-                        <Typography variant="caption" color={colors.textTertiary}>
-                            {new Date(item.updatedAt).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                            })}
-                        </Typography>
                         <TouchableOpacity
                             onPress={(e) => {
                                 e.stopPropagation();
-                                handleDelete(item);
+                                setPreviewImage(item.imageUri!);
                             }}
-                            hitSlop={8}
-                            style={styles.deleteBtn}
+                            activeOpacity={0.8}
+                            style={styles.imageContainer}
                         >
-                            <IconSymbol size={16} name="trash" color={Palette.error} />
+                            <Image
+                                source={{ uri: item.imageUri }}
+                                style={styles.cardImage}
+                                resizeMode="cover"
+                            />
+                            <View style={styles.imageOverlay}>
+                                <IconSymbol size={16} name="eye" color="#fff" />
+                            </View>
                         </TouchableOpacity>
+                    )}
+
+                    {/* Content on the right */}
+                    <View style={styles.cardContent}>
+                        <View style={styles.cardHeader}>
+                            {/* Completion checkbox */}
+
+
+                            <View style={{ flex: 1 }}>
+                                <Typography variant="body" weight="semiBold" color={colors.text}>
+                                    {item.clientName}
+                                </Typography>
+
+                                {item.address && (
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                                        <Typography variant="body" color={colors.text}>From:</Typography>
+                                        <Typography variant="caption" color={colors.textSecondary} >
+                                            {item.address}
+                                        </Typography>
+                                    </View>
+                                )}
+                            </View>
+                            {isCompleted && (
+                                <View style={[styles.badge, { backgroundColor: Palette.success + '18' }]}>
+                                    <IconSymbol size={12} name="checkmark" color={Palette.success} />
+                                    <Typography variant="caption" weight="semiBold" color={Palette.success}>
+                                        Done
+                                    </Typography>
+                                </View>
+                            )}
+                        </View>
+
+                        {item.notes && (
+                            <Typography
+                                variant="caption"
+                                color={colors.textSecondary}
+                                style={{ marginTop: Spacing.xs }}
+                                numberOfLines={2}
+                            >
+                                {item.notes}
+                            </Typography>
+                        )}
+
+                        <View style={styles.cardFooter}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                <Typography variant="caption" color={colors.textSecondary}>
+                                    {filledCount}/{fieldCount} fields • {item.unit}
+                                </Typography>
+                                <Typography variant="caption" color={colors.textTertiary}>
+                                    {new Date(item.updatedAt).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                    })}
+                                </Typography>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                <TouchableOpacity
+                                    onPress={(e) => handleToggleComplete(item, e)}
+                                    hitSlop={8}
+                                    style={[
+                                        styles.checkbox,
+                                        {
+                                            backgroundColor: isCompleted ? Palette.success : colors.surface,
+                                            borderColor: isCompleted ? Palette.success : colors.border,
+                                        }
+                                    ]}
+                                >
+                                    {isCompleted && (
+                                        <IconSymbol size={14} name="checkmark" color="#fff" />
+                                    )}
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(item);
+                                    }}
+                                    hitSlop={8}
+                                    style={styles.deleteBtn}
+                                >
+                                    <IconSymbol size={16} name="trash" color={Palette.error} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -198,7 +267,7 @@ export const Notes = () => {
 
         return (
             <View style={styles.section}>
-                <Typography variant="h4" color={colors.text} style={styles.sectionTitle}>
+                <Typography variant="body" size={18} color={colors.text} style={styles.sectionTitle}>
                     {title}
                 </Typography>
                 <FlatList
@@ -275,6 +344,36 @@ export const Notes = () => {
                     contentContainerStyle={styles.scrollContent}
                 />
             </View>
+
+            {/* Image Preview Modal */}
+            <Modal
+                visible={!!previewImage}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setPreviewImage(null)}
+            >
+                <View style={styles.modalContainer}>
+                    <TouchableOpacity
+                        style={styles.modalBackdrop}
+                        activeOpacity={1}
+                        onPress={() => setPreviewImage(null)}
+                    >
+                        <View style={styles.modalContent}>
+                            <Image
+                                source={{ uri: previewImage || '' }}
+                                style={styles.previewImage}
+                                resizeMode="contain"
+                            />
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={() => setPreviewImage(null)}
+                            >
+                                <IconSymbol size={24} name="xmark" color="#fff" />
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
         </ScreenWrapper>
     );
 };
@@ -306,7 +405,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         paddingHorizontal: Spacing.md,
-        marginBottom: Spacing.sm,
+        marginBottom: Spacing.xs,
     },
     listContent: {
         gap: Spacing.sm,
@@ -317,19 +416,47 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         overflow: 'hidden',
     },
-    cardContent: {
+    cardLayout: {
+        flexDirection: 'row',
         padding: Spacing.md,
+        gap: Spacing.md,
+    },
+    imageContainer: {
+        width: 90,
+        height: 90,
+        borderRadius: BorderRadius.md,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    cardImage: {
+        width: '100%',
+        height: '100%',
+    },
+    imageOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        padding: 4,
+        borderTopLeftRadius: BorderRadius.sm,
+    },
+    cardContent: {
+        flex: 1,
+        justifyContent: 'space-between',
     },
     cardHeader: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         gap: Spacing.sm,
     },
-    cardImage: {
-        width: '100%',
-        height: 120,
-        marginTop: Spacing.sm,
-        borderRadius: BorderRadius.md,
+    checkbox: {
+        width: 22,
+        height: 22,
+        borderRadius: BorderRadius.sm,
+        borderWidth: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 2,
     },
     badge: {
         flexDirection: 'row',
@@ -343,7 +470,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginTop: Spacing.sm,
+        marginTop: Spacing.xs,
     },
     deleteBtn: {
         padding: 4,
@@ -366,5 +493,35 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: Spacing.xl * 2,
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    },
+    modalBackdrop: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    previewImage: {
+        width: '100%',
+        height: '100%',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        width: 44,
+        height: 44,
+        borderRadius: BorderRadius.full,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

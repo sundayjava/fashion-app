@@ -1,15 +1,15 @@
-import React, { forwardRef, useCallback, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import { BorderRadius, Spacing } from '@/constants/spacing';
+import { useAppTheme } from '@/context/ThemeContext';
 import BottomSheet, {
-  BottomSheetView,
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetHandle,
   BottomSheetHandleProps,
   BottomSheetScrollView,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { BorderRadius, Spacing } from '@/constants/spacing';
-import { useAppTheme } from '@/context/ThemeContext';
+import React, { forwardRef, useCallback, useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import { Typography } from './Typography';
 
 export interface AppBottomSheetProps {
@@ -78,6 +78,9 @@ const AppBottomSheet = forwardRef<BottomSheet, AppBottomSheetProps>(
         handleIndicatorStyle={{ backgroundColor: colors.border }}
         onChange={onChange}
         onClose={onClose}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
       >
         {scrollable ? (
           <BottomSheetScrollView

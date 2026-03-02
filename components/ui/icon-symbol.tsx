@@ -20,10 +20,12 @@ const MAPPING = {
   'chevron.down': 'expand-more',
   'chevron.left.forwardslash.chevron.right': 'code',
   'xmark': 'close',
+  'xmark.circle.fill': 'cancel',
   'checkmark': 'check',
   // Biometrics
   'faceid': 'face',
   'touchid': 'fingerprint',
+  'eye': 'visibility',
   'eye.fill': 'visibility',
   // Tabs
   'gearshape.fill': 'settings',
@@ -73,6 +75,8 @@ const MAPPING = {
   'square.and.arrow.up': 'upload',
   'arrow.counterclockwise': 'restore',
   'calendar': 'event',
+  'camera': 'photo-camera',
+  'arrow.triangle.2.circlepath': 'sync',
   // Support
   'questionmark.circle.fill': 'help',
   'questionmark.circle': 'help-outline',
