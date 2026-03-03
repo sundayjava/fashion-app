@@ -1,12 +1,6 @@
+import { UserPortfolio } from '@/components/screens/portfolio'
 import React from 'react'
-import { Text, View } from 'react-native'
 
-const PortfolioScreen = () => {
-  return (
-    <View>
-      <Text>PortfolioScreen</Text>
-    </View>
-  )
+export default function PortfolioScreen() {
+  return <UserPortfolio />
 }
-
-export default PortfolioScreen

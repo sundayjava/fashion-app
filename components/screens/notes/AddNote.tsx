@@ -12,7 +12,7 @@ import { useMeasurementStore } from "@/stores/measurementStore";
 import { MeasurementField } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     FlatList,
     KeyboardAvoidingView,
@@ -143,33 +143,9 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
     const [templateName, setTemplateName] = useState('');
     const [presetSearchQuery, setPresetSearchQuery] = useState('');
 
-    // Load measurement data for editing or default template for new measurement
-    useEffect(() => {
-        const initializeData = async () => {
-            if (measurementId) {
-                // Editing existing measurement
-                await loadMeasurementForEdit(measurementId);
-                setIsEditing(true);
-            } else {
-                // Creating new measurement - load default template if no fields in store
-                if (fields.length === 0) {
-                    await loadDefaultTemplate();
-                }
-            }
-        };
-        initializeData();
-
-        // Cleanup: reset store when leaving the screen (only for new measurements)
-        return () => {
-            if (!measurementId) {
-                reset();
-            }
-        };
-    }, [measurementId]);
-
     // ── Database operations ───────────────────────────────────────────────────
 
-    const loadMeasurementForEdit = async (id: number) => {
+    const loadMeasurementForEdit = useCallback(async (id: number) => {
         try {
             const measurement = await dbService.getMeasurement(id);
             if (measurement) {
@@ -193,9 +169,9 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
             });
             router.back();
         }
-    };
+    }, [setFields, setUnit, router]);
 
-    const loadDefaultTemplate = async () => {
+    const loadDefaultTemplate = useCallback(async () => {
         try {
             const template = await dbService.getDefaultTemplate();
             if (template) {
@@ -210,7 +186,33 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
         } catch (error) {
             console.error('Failed to load default template:', error);
         }
-    };
+    }, [setFields]);
+
+    // Load measurement data for editing or default template for new measurement
+    useEffect(() => {
+        const initializeData = async () => {
+            if (measurementId) {
+                // Editing existing measurement
+                await loadMeasurementForEdit(measurementId);
+                setIsEditing(true);
+            } else {
+                // Creating new measurement - load default template if no fields in store
+                if (fields.length === 0) {
+                    await loadDefaultTemplate();
+                }
+            }
+        };
+        initializeData();
+
+        // Cleanup: reset store when leaving the screen (only for new measurements)
+        return () => {
+            if (!measurementId) {
+                reset();
+            }
+        };
+    }, [measurementId, fields.length, loadMeasurementForEdit, loadDefaultTemplate, reset]);
+
+    // ── Database operations ───────────────────────────────────────────────────
 
     const saveTemplateToDb = async () => {
         if (!templateName.trim()) return;
@@ -502,7 +504,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
             {/* ── Preset Field Bottom Sheet ── */}
             <AppBottomSheet
                 ref={presetBottomSheetRef}
-                snapPoints={['50%', '75%']}
+                snapPoints={['50%', '85%']}
                 title="Add Preset Field"
                 scrollable
             >

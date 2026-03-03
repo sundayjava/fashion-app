@@ -40,7 +40,7 @@ export default function SaveMeasurementScreen() {
     const [notes, setNotes] = useState('');
     const [imageUri, setImageUri] = useState<string | undefined>();
     const [saving, setSaving] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [_loading, setLoading] = useState(false);
 
     // Load existing measurement data if editing
     useEffect(() => {
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: Spacing.md,
+        paddingHorizontal: Spacing.sm,
         paddingVertical: Spacing.sm,
         borderBottomWidth: 1,
     },

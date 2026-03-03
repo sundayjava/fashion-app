@@ -2,31 +2,31 @@ import { DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { ThemePreference } from "@/stores/themeStore";
 
 export const SPECIALIZATIONS = [
-  'Fashion Design',
-  'Tailoring',
-  'Couture',
-  'Bridal Wear',
-  'Streetwear',
-  'Menswear',
-  'Womenswear',
-  'Kids Fashion',
-  'Formal Wear',
-  'Casual Wear',
-  'Traditional Wear',
-  'Ready-to-Wear',
-  'Activewear',
-  'Accessories',
-  'Shoe Making',
-  'Bag Making',
-  'Leather Work',
-  'Embroidery',
-  'Beading',
-  'Fabric Painting',
-  'Tie & Dye',
-  'Pattern Making',
-  'Garment Construction',
-  'Alterations',
-  'Upcycling',
+    'Fashion Design',
+    'Tailoring',
+    'Couture',
+    'Bridal Wear',
+    'Streetwear',
+    'Menswear',
+    'Womenswear',
+    'Kids Fashion',
+    'Formal Wear',
+    'Casual Wear',
+    'Traditional Wear',
+    'Ready-to-Wear',
+    'Activewear',
+    'Accessories',
+    'Shoe Making',
+    'Bag Making',
+    'Leather Work',
+    'Embroidery',
+    'Beading',
+    'Fabric Painting',
+    'Tie & Dye',
+    'Pattern Making',
+    'Garment Construction',
+    'Alterations',
+    'Upcycling',
 ];
 
 export const PRODUCTION_TIMES = [
@@ -45,40 +45,40 @@ export const MEASUREMENT_METHODS = [
 ];
 
 export const CURRENCIES = [
-  { code: 'NGN', label: 'Nigerian Naira (₦)' },
-  { code: 'USD', label: 'US Dollar ($)' },
-  { code: 'EUR', label: 'Euro (€)' },
-  { code: 'GBP', label: 'British Pound (£)' },
-  { code: 'GHS', label: 'Ghanaian Cedi (₵)' },
-  { code: 'KES', label: 'Kenyan Shilling (KES)' },
-  { code: 'ZAR', label: 'South African Rand (R)' },
+    { code: 'NGN', label: 'Nigerian Naira (₦)' },
+    { code: 'USD', label: 'US Dollar ($)' },
+    { code: 'EUR', label: 'Euro (€)' },
+    { code: 'GBP', label: 'British Pound (£)' },
+    { code: 'GHS', label: 'Ghanaian Cedi (₵)' },
+    { code: 'KES', label: 'Kenyan Shilling (KES)' },
+    { code: 'ZAR', label: 'South African Rand (R)' },
 
-  { code: 'CAD', label: 'Canadian Dollar (CA$)' },
-  { code: 'AUD', label: 'Australian Dollar (A$)' },
-  { code: 'NZD', label: 'New Zealand Dollar (NZ$)' },
+    { code: 'CAD', label: 'Canadian Dollar (CA$)' },
+    { code: 'AUD', label: 'Australian Dollar (A$)' },
+    { code: 'NZD', label: 'New Zealand Dollar (NZ$)' },
 
-  { code: 'JPY', label: 'Japanese Yen (¥)' },
-  { code: 'CNY', label: 'Chinese Yuan (¥)' },
-  { code: 'INR', label: 'Indian Rupee (₹)' },
-  { code: 'AED', label: 'UAE Dirham (د.إ)' },
-  { code: 'SAR', label: 'Saudi Riyal (﷼)' },
-  { code: 'QAR', label: 'Qatari Riyal (﷼)' },
+    { code: 'JPY', label: 'Japanese Yen (¥)' },
+    { code: 'CNY', label: 'Chinese Yuan (¥)' },
+    { code: 'INR', label: 'Indian Rupee (₹)' },
+    { code: 'AED', label: 'UAE Dirham (د.إ)' },
+    { code: 'SAR', label: 'Saudi Riyal (﷼)' },
+    { code: 'QAR', label: 'Qatari Riyal (﷼)' },
 
-  { code: 'CHF', label: 'Swiss Franc (CHF)' },
-  { code: 'SEK', label: 'Swedish Krona (kr)' },
-  { code: 'NOK', label: 'Norwegian Krone (kr)' },
-  { code: 'DKK', label: 'Danish Krone (kr)' },
+    { code: 'CHF', label: 'Swiss Franc (CHF)' },
+    { code: 'SEK', label: 'Swedish Krona (kr)' },
+    { code: 'NOK', label: 'Norwegian Krone (kr)' },
+    { code: 'DKK', label: 'Danish Krone (kr)' },
 
-  { code: 'SGD', label: 'Singapore Dollar (S$)' },
-  { code: 'HKD', label: 'Hong Kong Dollar (HK$)' },
-  { code: 'MYR', label: 'Malaysian Ringgit (RM)' },
-  { code: 'THB', label: 'Thai Baht (฿)' },
-  { code: 'IDR', label: 'Indonesian Rupiah (Rp)' },
+    { code: 'SGD', label: 'Singapore Dollar (S$)' },
+    { code: 'HKD', label: 'Hong Kong Dollar (HK$)' },
+    { code: 'MYR', label: 'Malaysian Ringgit (RM)' },
+    { code: 'THB', label: 'Thai Baht (฿)' },
+    { code: 'IDR', label: 'Indonesian Rupiah (Rp)' },
 
-  { code: 'BRL', label: 'Brazilian Real (R$)' },
-  { code: 'MXN', label: 'Mexican Peso (MX$)' },
-  { code: 'ARS', label: 'Argentine Peso (AR$)' },
-  { code: 'EGP', label: 'Egyptian Pound (E£)' },
+    { code: 'BRL', label: 'Brazilian Real (R$)' },
+    { code: 'MXN', label: 'Mexican Peso (MX$)' },
+    { code: 'ARS', label: 'Argentine Peso (AR$)' },
+    { code: 'EGP', label: 'Egyptian Pound (E£)' },
 ];
 
 export const SERVICE_AREAS = [
@@ -94,10 +94,11 @@ export const UNITS = [
 ];
 
 export const PRESET_FIELDS = [
-    'Chest', 'Waist', 'Hips', 'Shoulder Width', 'Sleeve Length',
-    'Inseam', 'Outseam', 'Neck', 'Upper Arm', 'Wrist',
-    'Thigh', 'Knee', 'Ankle', 'Back Length', 'Front Length',
-    'Bust', 'Under Bust', 'Torso', 'Rise', 'Calf',
+    'Full Length', 'Chest Round ', 'Waist Round', 'Hips Round', 'Shoulder', "Chest", "Waist", "Hips",
+    'Across Back', 'Neck Round', 'Neck to Waist', 'Armhole', "Shirt Length", "Skirt Length", "Pant Length", 'Inseam', 'Outseam', 'Crotch Depth', 'Bicep Round',
+    'Top Arm Round', 'Wrist Round', 'Sleeve Length', 'Body Raise', 'Inside Leg Length', "Inseam/ Inside Leg Length", "Bottom Cuff Rounding",
+    'Outside Leg Length', 'Bust Round', 'Waist to Floor', 'Waist to Ankle', 'Waist to Knee',
+    'Shoulder to Knee', "Dart Point", "Elbow Round", "Thigh Round", "Calf Round", "Knee Round", "Ankle Round",
 ];
 
 export const MENU_ITEMS: DropdownMenuItem[] = [
@@ -108,7 +109,7 @@ export const MENU_ITEMS: DropdownMenuItem[] = [
 ];
 
 export const THEME_OPTIONS: { label: string; value: ThemePreference; icon: string; desc: string }[] = [
-  { label: 'System', value: 'system', icon: 'gearshape.fill', desc: 'Follows your device setting' },
-  { label: 'Light',  value: 'light',  icon: 'sun.max.fill',  desc: 'Always light mode' },
-  { label: 'Dark',   value: 'dark',   icon: 'moon.fill',     desc: 'Always dark mode' },
+    { label: 'System', value: 'system', icon: 'gearshape.fill', desc: 'Follows your device setting' },
+    { label: 'Light', value: 'light', icon: 'sun.max.fill', desc: 'Always light mode' },
+    { label: 'Dark', value: 'dark', icon: 'moon.fill', desc: 'Always dark mode' },
 ];

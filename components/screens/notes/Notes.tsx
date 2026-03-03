@@ -22,7 +22,7 @@ import Toast from "react-native-toast-message";
 
 export const Notes = () => {
     const router = useRouter();
-    const { colors, isDark } = useAppTheme();
+    const { colors } = useAppTheme();
 
     const [ownedMeasurements, setOwnedMeasurements] = useState<MeasurementRecord[]>([]);
     const [sharedMeasurements, setSharedMeasurements] = useState<MeasurementRecord[]>([]);
@@ -87,7 +87,7 @@ export const Notes = () => {
                                 text2: `"${measurement.clientName}" has been deleted`,
                             });
                             loadMeasurements();
-                        } catch (error) {
+                        } catch (_error) {
                             Toast.show({
                                 type: 'error',
                                 text1: 'Error',
@@ -111,7 +111,7 @@ export const Notes = () => {
                 text2: `${measurement.clientName}`,
             });
             loadMeasurements();
-        } catch (error) {
+        } catch (_error) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -140,7 +140,7 @@ export const Notes = () => {
             >
                 <View style={styles.cardLayout}>
                     {/* Image on the left */}
-                    {item.imageUri && (
+                    {item.imageUri ? (
                         <TouchableOpacity
                             onPress={(e) => {
                                 e.stopPropagation();
@@ -158,7 +158,7 @@ export const Notes = () => {
                                 <IconSymbol size={16} name="eye" color="#fff" />
                             </View>
                         </TouchableOpacity>
-                    )}
+                    ) : null}
 
                     {/* Content on the right */}
                     <View style={styles.cardContent}>
@@ -171,26 +171,26 @@ export const Notes = () => {
                                     {item.clientName}
                                 </Typography>
 
-                                {item.address && (
+                                {item.address ? (
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
                                         <Typography variant="body" color={colors.text}>From:</Typography>
                                         <Typography variant="caption" color={colors.textSecondary} >
                                             {item.address}
                                         </Typography>
                                     </View>
-                                )}
+                                ) : null}
                             </View>
-                            {isCompleted && (
+                            {isCompleted ? (
                                 <View style={[styles.badge, { backgroundColor: Palette.success + '18' }]}>
                                     <IconSymbol size={12} name="checkmark" color={Palette.success} />
                                     <Typography variant="caption" weight="semiBold" color={Palette.success}>
                                         Done
                                     </Typography>
                                 </View>
-                            )}
+                            ) : null}
                         </View>
 
-                        {item.notes && (
+                        {item.notes ? (
                             <Typography
                                 variant="caption"
                                 color={colors.textSecondary}
@@ -199,7 +199,7 @@ export const Notes = () => {
                             >
                                 {item.notes}
                             </Typography>
-                        )}
+                        ) : null}
 
                         <View style={styles.cardFooter}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -226,9 +226,9 @@ export const Notes = () => {
                                         }
                                     ]}
                                 >
-                                    {isCompleted && (
+                                    {isCompleted ? (
                                         <IconSymbol size={14} name="checkmark" color="#fff" />
-                                    )}
+                                    ) : null}
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={(e) => {
@@ -327,10 +327,10 @@ export const Notes = () => {
                             ) : ownedMeasurements.length === 0 && sharedMeasurements.length === 0 ? (
                                 renderEmptyState()
                             ) : (
-                                <>
+                                <View style={{ paddingHorizontal: Spacing.md, paddingBottom: Spacing.lg }}>
                                     {renderSection('Your Measurements', ownedMeasurements)}
                                     {renderSection('Shared with You', sharedMeasurements)}
-                                </>
+                                </View>
                             )}
                         </>
                     }
@@ -404,7 +404,6 @@ const styles = StyleSheet.create({
         marginBottom: Spacing.lg,
     },
     sectionTitle: {
-        paddingHorizontal: Spacing.md,
         marginBottom: Spacing.xs,
     },
     listContent: {
@@ -415,6 +414,7 @@ const styles = StyleSheet.create({
         borderRadius: BorderRadius.lg,
         borderWidth: 1.5,
         overflow: 'hidden',
+        marginBottom: Spacing.sm,
     },
     cardLayout: {
         flexDirection: 'row',

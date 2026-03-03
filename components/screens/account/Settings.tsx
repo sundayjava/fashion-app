@@ -126,10 +126,10 @@ export const Settings = () => {
 
   return (
     <ScreenWrapper
-      padded
+      padded={false}
       keyboardAvoiding
       keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
-      style={{ paddingVertical: Spacing.md }}
+      style={{ paddingVertical: Spacing.md, paddingHorizontal: Spacing.md }}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <Typography variant="h2" style={{ marginBottom: Spacing.md }}>

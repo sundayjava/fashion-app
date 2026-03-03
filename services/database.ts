@@ -44,7 +44,7 @@ export interface TemplateRecord {
 
 class DatabaseService {
     private db: SQLite.SQLiteDatabase | null = null;
-    private readonly DB_VERSION = 1; // Increment when schema changes
+    private readonly DB_VERSION = 4; // Increment when schema changes
 
     /**
      * Initialize the database and create tables if they don't exist
