@@ -182,6 +182,54 @@ export const profileSchema = yup.object({
   dob: dobSchema.optional(),
 });
 
+/** Create/Edit Post */
+export const postSchema = yup.object({
+  caption: yup
+    .string()
+    .trim()
+    .required('Caption is required')
+    .min(3, 'Caption must be at least 3 characters')
+    .max(2200, 'Caption must be at most 2200 characters'),
+  tags: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'Add at least one tag')
+    .max(10, 'Maximum 10 tags allowed')
+    .required('Tags are required'),
+  categoryId: yup
+    .string()
+    .required('Category is required'),
+  priceMin: yup
+    .number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .positive('Price must be positive')
+    .optional(),
+  priceMax: yup
+    .number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .positive('Price must be positive')
+    .when('priceMin', {
+      is: (val: number) => val !== undefined && val > 0,
+      then: (schema) => schema.min(yup.ref('priceMin'), 'Maximum price must be greater than minimum'),
+      otherwise: (schema) => schema.optional(),
+    })
+    .optional(),
+  availability: yup
+    .string()
+    .oneOf(['in_stock', 'made_to_order', 'sold_out', 'coming_soon'], 'Invalid availability status')
+    .optional(),
+  collection: yup
+    .string()
+    .trim()
+    .max(50, 'Collection name must be at most 50 characters')
+    .optional(),
+  location: yup
+    .string()
+    .trim()
+    .max(100, 'Location must be at most 100 characters')
+    .optional(),
+});
+
 export type EmailPhoneFormValues = yup.InferType<typeof emailPhoneSchema>;
 export type BusinessRegisterFormValues = yup.InferType<typeof businessRegisterSchema>;
 export type PasswordCreationFormValues = yup.InferType<typeof passwordCreationSchema>;
@@ -191,3 +239,4 @@ export type ForgotPasswordFormValues = yup.InferType<typeof forgotPasswordSchema
 export type ForgotPasswordDynamicFormValues = yup.InferType<typeof forgotPasswordDynamicSchema>;
 export type ResetPasswordFormValues = yup.InferType<typeof resetPasswordSchema>;
 export type ProfileFormValues = yup.InferType<typeof profileSchema>;
+export type PostFormValues = yup.InferType<typeof postSchema>;

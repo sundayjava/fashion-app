@@ -8,6 +8,7 @@ export default function AppLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(account)" />
       <Stack.Screen name="(notes)" />
+      <Stack.Screen name="(post)" />
       <Stack.Screen name="coming-soon" />
     </Stack>
   );

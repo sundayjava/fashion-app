@@ -32,6 +32,7 @@ export default function TabLayout() {
     );
   }
 
+  //Android
   return (
     <Tabs
       tabBar={(props) => <GlassTabBar {...props} />}
@@ -56,6 +57,7 @@ export default function TabLayout() {
         options={{
           title: 'Add Post',
           tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="plus" color={color} />,
+          href: '/(app)/(post)/add-post',
         }}
       />
       <Tabs.Screen

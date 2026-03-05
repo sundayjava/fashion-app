@@ -7,7 +7,9 @@ export { AppModal, ConfirmModal } from './AppModal';
 export { Avatar } from './Avatar';
 export { BackButton } from './BackButton';
 export { Badge } from './Badge';
-export { ControlledDOB, ControlledInput, ControlledPhone } from './ControlledInputs';
+export { CategorySelector } from './CategorySelector';
+export type { Category } from './CategorySelector';
+export { ControlledCategorySelector, ControlledDOB, ControlledInput, ControlledPhone, ControlledTagInput } from './ControlledInputs';
 export { Divider } from './Divider';
 export { DOBInput } from './DOBInput';
 export { DropdownMenu } from './DropdownMenu';
@@ -24,6 +26,7 @@ export { OTPInput } from './OTPInput';
 export { PhoneInput } from './PhoneInput';
 export type { PhoneValue } from './PhoneInput';
 export { ScreenWrapper } from './ScreenWrapper';
+export { TagInput } from './TagInput';
 export { AppToastHost, buildToastConfig, hideToast, showToast } from './Toast';
 export { Typography } from './Typography';
 

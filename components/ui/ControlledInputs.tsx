@@ -17,9 +17,11 @@
 import React from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { TextInputProps, ViewStyle } from 'react-native';
+import { Category, CategorySelector } from './CategorySelector';
 import { DOBInput } from './DOBInput';
 import { AppInput } from './Input';
 import { PhoneInput } from './PhoneInput';
+import { TagInput } from './TagInput';
 
 // ─── Generic Text Input ───────────────────────────────────────────────────
 
@@ -140,6 +142,88 @@ export function ControlledDOB<T extends FieldValues>({
           onChange={onChange}
           minimumDate={minimumDate}
           maximumDate={maximumDate}
+          containerStyle={containerStyle}
+        />
+      )}
+    />
+  );
+}
+
+// ─── Tag Input ────────────────────────────────────────────────────────────
+
+interface ControlledTagInputProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  label?: string;
+  hint?: string;
+  maxTags?: number;
+  placeholder?: string;
+  containerStyle?: ViewStyle;
+}
+
+export function ControlledTagInput<T extends FieldValues>({
+  control,
+  name,
+  label,
+  hint,
+  maxTags,
+  placeholder,
+  containerStyle,
+}: ControlledTagInputProps<T>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
+        <TagInput
+          label={label}
+          hint={hint}
+          error={error?.message}
+          value={value || []}
+          onChange={onChange}
+          maxTags={maxTags}
+          placeholder={placeholder}
+          containerStyle={containerStyle}
+        />
+      )}
+    />
+  );
+}
+
+// ─── Category Selector ────────────────────────────────────────────────────
+
+interface ControlledCategorySelectorProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  label?: string;
+  hint?: string;
+  categories: Category[];
+  placeholder?: string;
+  containerStyle?: ViewStyle;
+}
+
+export function ControlledCategorySelector<T extends FieldValues>({
+  control,
+  name,
+  label,
+  hint,
+  categories,
+  placeholder,
+  containerStyle,
+}: ControlledCategorySelectorProps<T>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
+        <CategorySelector
+          label={label}
+          hint={hint}
+          error={error?.message}
+          value={value}
+          onChange={onChange}
+          categories={categories}
+          placeholder={placeholder}
           containerStyle={containerStyle}
         />
       )}
