@@ -92,7 +92,7 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -10,
     left: 0,
     right: 0,
     paddingHorizontal: Spacing.md,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: Platform.OS === 'android' ? 8 : 12,
     paddingHorizontal: 8,
-    borderRadius: 20,
+    borderRadius:40,
     minHeight: Platform.OS === 'android' ? 56 : 52,
     backgroundColor: 'transparent',
   },

@@ -9,6 +9,7 @@ export default function AppLayout() {
       <Stack.Screen name="(account)" />
       <Stack.Screen name="(notes)" />
       <Stack.Screen name="(post)" />
+      <Stack.Screen name="(home)" />
       <Stack.Screen name="coming-soon" />
     </Stack>
   );

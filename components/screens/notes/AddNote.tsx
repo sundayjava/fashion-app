@@ -43,7 +43,6 @@ function UnitChip({ unit, onPress }: { unit: string; onPress: () => void }) {
 
 function MeasurementRow({
     field,
-    unit,
     onValueChange,
     onRemove,
     isLast,
@@ -91,11 +90,11 @@ function MeasurementRow({
                     selectTextOnFocus
                     returnKeyType={isLast ? "done" : "next"}
                     onSubmitEditing={onSubmitEditing}
-                    blurOnSubmit={false}
+                    submitBehavior="submit"
                 />
             </View>
             <TouchableOpacity onPress={() => onRemove(field.id)} hitSlop={8} style={{ marginLeft: Spacing.md }}>
-                <IconSymbol size={18} name="trash" color={colors.textTertiary} />
+                <IconSymbol size={20} name="trash" color={colors.error} />
             </TouchableOpacity>
         </View>
     );
@@ -210,7 +209,7 @@ export const AddNotes = ({ measurementId }: { measurementId?: number }) => {
                 reset();
             }
         };
-    }, [measurementId, fields.length, loadMeasurementForEdit, loadDefaultTemplate, reset]);
+    }, [measurementId, loadMeasurementForEdit, loadDefaultTemplate, reset]);
 
     // ── Database operations ───────────────────────────────────────────────────
 

@@ -111,7 +111,7 @@ export const ProfileSettings = () => {
             return;
         }
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             allowsEditing: true,
             aspect: type === 'cover' ? [16, 9] : [1, 1],
             quality: 0.85,

@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: Spacing.lg,
+    paddingHorizontal: Spacing.md,
   },
   scrollContent: {
     padding: Spacing.lg,
