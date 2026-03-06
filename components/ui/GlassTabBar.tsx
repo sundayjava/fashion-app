@@ -1,4 +1,4 @@
-import { BorderRadius, Shadow, Spacing } from '@/constants/spacing';
+import { Shadow, Spacing } from '@/constants/spacing';
 import { useAppTheme } from '@/context/ThemeContext';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
@@ -54,10 +54,6 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 onLongPress={onLongPress}
                 style={[
                   styles.tab,
-                  isFocused && [
-                    styles.tabFocused,
-                    { backgroundColor: colors.primary + '20' }
-                  ]
                 ]}
                 accessibilityRole="button"
                 accessibilityState={isFocused ? { selected: true } : {}}
@@ -65,15 +61,15 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
               >
                 {options.tabBarIcon?.({
                   focused: isFocused,
-                  color: isFocused ? colors.primary : colors.text,
-                  size: 22,
+                  color: isFocused ? colors.primary : colors.icon,
+                  size: 24,
                 })}
-                {Platform.OS === 'android' && (
+                {Platform.OS === 'android' && label && (
                   <Text
                     numberOfLines={1}
                     style={[
                       styles.label,
-                      { color: isFocused ? colors.primary : colors.text },
+                      { color: isFocused ? colors.primary : colors.icon },
                       isFocused && styles.labelFocused,
                     ]}
                   >
@@ -92,7 +88,7 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    bottom: -10,
+    bottom: -3,
     left: 0,
     right: 0,
     paddingHorizontal: Spacing.md,
@@ -126,27 +122,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Platform.OS === 'android' ? 8 : 12,
+    paddingVertical: Platform.OS === 'android' ? 0 : 12,
     paddingHorizontal: 8,
     borderRadius:40,
-    minHeight: Platform.OS === 'android' ? 56 : 52,
+    minHeight: Platform.OS === 'android' ? 50 : 52,
     backgroundColor: 'transparent',
   },
   tabFocused: {
     transform: [{ scale: 1.05 }],
   },
-  iconWrapper: {
-    width: 44,
-    height: 32,
-    borderRadius: BorderRadius.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   label: {
     fontSize: 10,
     fontWeight: '500',
     letterSpacing: 0.3,
-    marginTop: 3,
     backgroundColor: 'transparent',
   },
   labelFocused: {

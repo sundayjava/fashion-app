@@ -303,7 +303,7 @@ export const HomeComponent = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginBottom: Spacing['xl'],
+        paddingBottom: Spacing['xl'],
     },
     header: {
         position: 'absolute',

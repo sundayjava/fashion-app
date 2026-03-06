@@ -1,12 +1,14 @@
 import { LocationPin } from "@/assets/icons/LocationPin";
+import { SearchIcon } from "@/assets/icons/SearchIcon";
 import { ScreenWrapper, Typography } from "@/components/ui";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Palette } from "@/constants/colors";
 import { BorderRadius, Spacing } from "@/constants/spacing";
 import { useAppTheme } from "@/context/ThemeContext";
 import { Image } from "expo-image";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+    Animated,
     Dimensions,
     FlatList,
     Platform,
@@ -15,13 +17,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import Animated, {
-    Extrapolation,
-    interpolate,
-    useAnimatedRef,
-    useAnimatedStyle,
-    useScrollViewOffset
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PortfolioGridItem, type PortfolioItem } from "./PortfolioGridItem";
 import { PortfolioListItem } from "./PortfolioListItem";
@@ -164,8 +159,7 @@ const MOCK_PORTFOLIO_ITEMS: PortfolioItem[] = [
 export const UserPortfolio = () => {
     const { colors } = useAppTheme();
     const insets = useSafeAreaInsets();
-    const scrollRef = useAnimatedRef<Animated.FlatList<PortfolioItem>>();
-    const scrollOffset = useScrollViewOffset(scrollRef);
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     // Filter and view states
     const [activeTab, setActiveTab] = useState<TabType>('All');
@@ -223,7 +217,7 @@ export const UserPortfolio = () => {
         ({ item }: { item: PortfolioItem }) => {
             if (viewMode === 'grid') {
                 return (
-                    <View style={styles.gridItemWrapper}>
+                    <View >
                         <PortfolioGridItem item={item} onPress={handleItemPress} />
                     </View>
                 );
@@ -233,63 +227,47 @@ export const UserPortfolio = () => {
         [viewMode, handleItemPress]
     );
 
-    // Animated styles
-    const animatedHeaderStyle = useAnimatedStyle(() => {
-        'worklet';
-        const opacity =interpolate(
-            scrollOffset.value,
-            [SCROLL_THRESHOLD - 50, SCROLL_THRESHOLD],
-            [0, 1],
-            Extrapolation.CLAMP
-        );
+    // Animated styles using regular React Native Animated API (like HomeComponent)
+    const animatedHeaderOpacity = scrollY.interpolate({
+        inputRange: [SCROLL_THRESHOLD - 50, SCROLL_THRESHOLD],
+        outputRange: [0, 1],
+        extrapolate: 'clamp',
+    });
 
-        const translateY = interpolate(
-            scrollOffset.value,
-            [SCROLL_THRESHOLD - 50, SCROLL_THRESHOLD],
-            [-20, 0],
-            Extrapolation.CLAMP
-        );
+    const animatedHeaderTranslateY = scrollY.interpolate({
+        inputRange: [SCROLL_THRESHOLD - 50, SCROLL_THRESHOLD],
+        outputRange: [-20, 0],
+        extrapolate: 'clamp',
+    });
 
-        return {
-            opacity,
-            transform: [{ translateY }],
-        };
-    }, []);
+    const floatingButtonsOpacity = scrollY.interpolate({
+        inputRange: [0, 30],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+    });
 
-    const floatingButtonsStyle = useAnimatedStyle(() => {
-        'worklet';
-        const opacity = interpolate(
-            scrollOffset.value,
-            [0, 30],
-            [1, 0],
-            Extrapolation.CLAMP
-        );
+    const stickyTabBarOpacity = scrollY.interpolate({
+        inputRange: [SCROLL_THRESHOLD + 197 - 20, SCROLL_THRESHOLD + 197],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+    });
 
-        return {
-            opacity,
-        };
-    }, []);
+    const floatingStickyTabOpacity = scrollY.interpolate({
+        inputRange: [SCROLL_THRESHOLD + 197 - 20, SCROLL_THRESHOLD + 197],
+        outputRange: [0, 1],
+        extrapolate: 'clamp',
+    });
 
-    const stickyTabBarStyle = useAnimatedStyle(() => {
-        'worklet';
-        const shouldStick = scrollOffset.value > SCROLL_THRESHOLD + 197;
+    const floatingStickyTabTranslateY = scrollY.interpolate({
+        inputRange: [SCROLL_THRESHOLD + 197 - 20, SCROLL_THRESHOLD + 197],
+        outputRange: [-20, 0],
+        extrapolate: 'clamp',
+    });
 
-        return {
-            opacity: shouldStick ? 0 : 1, // Hide tab bar in header when it should stick
-        };
-    }, []);
-
-    const floatingStickyTabStyle = useAnimatedStyle(() => {
-        'worklet';
-        const shouldStick = scrollOffset.value > SCROLL_THRESHOLD + 197;
-
-        return {
-            opacity: shouldStick ? 1 : 0,
-            transform: [{
-                translateY: shouldStick ? 0 : -20
-            }],
-        };
-    }, []);
+    const handleScroll = Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: true }
+    );
 
     // List header component (memoized)
     const ListHeaderComponent = useCallback(() => (
@@ -335,7 +313,10 @@ export const UserPortfolio = () => {
                 </View>
 
                 {/* Floating Action Buttons */}
-                <Animated.View style={[styles.floatingButtons, floatingButtonsStyle]}>
+                <Animated.View style={[
+                    styles.floatingButtons,
+                    { opacity: floatingButtonsOpacity }
+                ]}>
                     <TouchableOpacity
                         style={[styles.floatingIconButton, { backgroundColor: colors.background }]}
                         activeOpacity={0.7}
@@ -458,7 +439,7 @@ export const UserPortfolio = () => {
             </View>
 
             {/* Tab Bar in Header */}
-            <Animated.View style={stickyTabBarStyle}>
+            <Animated.View style={{ opacity: stickyTabBarOpacity }}>
                 <View style={[styles.tabBar, {
                     backgroundColor: colors.background,
                     borderBottomColor: colors.border,
@@ -553,7 +534,7 @@ export const UserPortfolio = () => {
     ), [
         coverUri, logoUri, businessName, userName, address, serviceArea, productionTime,
         specializations, links, colors, activeTab, selectedCategory, viewMode, categories,
-        floatingButtonsStyle, stickyTabBarStyle
+        floatingButtonsOpacity, stickyTabBarOpacity
     ]);
 
     // List empty component
@@ -590,15 +571,15 @@ export const UserPortfolio = () => {
         <ScreenWrapper padded={false}>
             {/* Animated Top Bar */}
             <Animated.View
-                collapsable={false}
                 style={[
                     styles.animatedHeader,
                     {
                         backgroundColor: colors.background,
                         borderBottomColor: colors.border,
                         paddingTop: insets.top,
+                        opacity: animatedHeaderOpacity,
+                        transform: [{ translateY: animatedHeaderTranslateY }],
                     },
-                    animatedHeaderStyle,
                 ]}
                 pointerEvents="box-none"
             >
@@ -617,7 +598,7 @@ export const UserPortfolio = () => {
                             activeOpacity={0.7}
                             hitSlop={8}
                         >
-                            <IconSymbol size={20} name="magnifyingglass" color={colors.text} />
+                            <SearchIcon width={22} height={22} color={colors.icon} />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.iconButton}
@@ -639,15 +620,15 @@ export const UserPortfolio = () => {
 
             {/* Floating Sticky Tab Bar (appears when scrolling) */}
             <Animated.View
-                collapsable={false}
                 style={[
                     styles.floatingStickyTab,
                     {
                         backgroundColor: colors.background,
                         borderBottomColor: colors.border,
                         top: insets.top + 60,
+                        opacity: floatingStickyTabOpacity,
+                        transform: [{ translateY: floatingStickyTabTranslateY }],
                     },
-                    floatingStickyTabStyle,
                 ]}
                 pointerEvents="box-none"
             >
@@ -744,7 +725,6 @@ export const UserPortfolio = () => {
 
             {/* Optimized FlatList */}
             <Animated.FlatList
-                ref={scrollRef}
                 data={filteredItems}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
@@ -755,7 +735,8 @@ export const UserPortfolio = () => {
                 contentContainerStyle={styles.flatListContent}
                 columnWrapperStyle={viewMode === 'grid' ? styles.columnWrapper : undefined}
                 showsVerticalScrollIndicator={false}
-                scrollEventThrottle={Platform.OS === 'android' ? 8 : 16}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
                 removeClippedSubviews={Platform.OS === 'android'}
                 maxToRenderPerBatch={10}
                 initialNumToRender={10}
@@ -999,10 +980,6 @@ const styles = StyleSheet.create({
     columnWrapper: {
         justifyContent: 'space-between',
         paddingHorizontal: Spacing.xs,
-    },
-    gridItemWrapper: {
-        flex: 1,
-        maxWidth: '48%',
     },
     emptyState: {
         margin: Spacing.md,

@@ -1,5 +1,9 @@
+import { AddShapeCircleIcon } from '@/assets/icons/AddShapedCircleIcon';
+import { HomeIcon } from '@/assets/icons/HomeIcon';
+import { NotesIcon } from '@/assets/icons/NotesIcon';
+import { PersonAccountIcon } from '@/assets/icons/PersonAccountIcon';
+import { SettingIcon } from '@/assets/icons/SettingsIcon';
 import { GlassTabBar } from '@/components/ui/GlassTabBar';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAppTheme } from '@/context/ThemeContext';
 import { Tabs } from 'expo-router';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
@@ -42,21 +46,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => <HomeIcon color={color} width={size} height={size}/>,
         }}
       />
       <Tabs.Screen
         name="portfolio"
         options={{
           title: 'Portfolio',
-          tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="person" color={color} />,
+          tabBarIcon: ({ color }) => <PersonAccountIcon color={color} width={26} height={26}/>,
         }}
       />
       <Tabs.Screen
         name="add-post"
         options={{
-          title: 'Add Post',
-          tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="plus" color={color} />,
+          title: '',
+          tabBarIcon: () => <AddShapeCircleIcon color={colors.text} width={42} height={42}/>,
           href: '/(app)/(post)/add-post',
         }}
       />
@@ -64,14 +68,14 @@ export default function TabLayout() {
         name="notes"
         options={{
           title: 'Notes',
-          tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="note" color={color} />,
+          tabBarIcon: ({ color, size }) => <NotesIcon color={color} width={size} height={size}/>,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size }) => <IconSymbol size={size} name="gearshape.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => <SettingIcon color={color} width={size} height={size}/>,
         }}
       />
     </Tabs>
