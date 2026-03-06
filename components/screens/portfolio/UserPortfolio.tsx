@@ -235,6 +235,7 @@ export const UserPortfolio = () => {
 
     // Animated styles
     const animatedHeaderStyle = useAnimatedStyle(() => {
+        'worklet';
         const opacity =interpolate(
             scrollOffset.value,
             [SCROLL_THRESHOLD - 50, SCROLL_THRESHOLD],
@@ -253,9 +254,10 @@ export const UserPortfolio = () => {
             opacity,
             transform: [{ translateY }],
         };
-    });
+    }, []);
 
     const floatingButtonsStyle = useAnimatedStyle(() => {
+        'worklet';
         const opacity = interpolate(
             scrollOffset.value,
             [0, 30],
@@ -266,17 +268,19 @@ export const UserPortfolio = () => {
         return {
             opacity,
         };
-    });
+    }, []);
 
     const stickyTabBarStyle = useAnimatedStyle(() => {
+        'worklet';
         const shouldStick = scrollOffset.value > SCROLL_THRESHOLD + 197;
 
         return {
             opacity: shouldStick ? 0 : 1, // Hide tab bar in header when it should stick
         };
-    });
+    }, []);
 
     const floatingStickyTabStyle = useAnimatedStyle(() => {
+        'worklet';
         const shouldStick = scrollOffset.value > SCROLL_THRESHOLD + 197;
 
         return {
@@ -285,7 +289,7 @@ export const UserPortfolio = () => {
                 translateY: shouldStick ? 0 : -20
             }],
         };
-    });
+    }, []);
 
     // List header component (memoized)
     const ListHeaderComponent = useCallback(() => (
@@ -586,6 +590,7 @@ export const UserPortfolio = () => {
         <ScreenWrapper padded={false}>
             {/* Animated Top Bar */}
             <Animated.View
+                collapsable={false}
                 style={[
                     styles.animatedHeader,
                     {
@@ -634,6 +639,7 @@ export const UserPortfolio = () => {
 
             {/* Floating Sticky Tab Bar (appears when scrolling) */}
             <Animated.View
+                collapsable={false}
                 style={[
                     styles.floatingStickyTab,
                     {
@@ -749,7 +755,7 @@ export const UserPortfolio = () => {
                 contentContainerStyle={styles.flatListContent}
                 columnWrapperStyle={viewMode === 'grid' ? styles.columnWrapper : undefined}
                 showsVerticalScrollIndicator={false}
-                scrollEventThrottle={16}
+                scrollEventThrottle={Platform.OS === 'android' ? 8 : 16}
                 removeClippedSubviews={Platform.OS === 'android'}
                 maxToRenderPerBatch={10}
                 initialNumToRender={10}
