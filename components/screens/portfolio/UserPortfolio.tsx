@@ -1,5 +1,7 @@
+import { EditIcon } from "@/assets/icons/EditIcon";
 import { LocationPin } from "@/assets/icons/LocationPin";
 import { SearchIcon } from "@/assets/icons/SearchIcon";
+import { ShareIcon } from "@/assets/icons/ShareIcon";
 import { ScreenWrapper, Typography } from "@/components/ui";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Palette } from "@/constants/colors";
@@ -321,19 +323,19 @@ export const UserPortfolio = () => {
                         style={[styles.floatingIconButton, { backgroundColor: colors.background }]}
                         activeOpacity={0.7}
                     >
-                        <IconSymbol size={20} name="magnifyingglass" color={colors.text} />
+                        <SearchIcon color={colors.icon} width={22} height={22} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[styles.floatingIconButton, { backgroundColor: colors.background }]}
                         activeOpacity={0.7}
                     >
-                        <IconSymbol size={20} name="pencil.line" color={colors.text} />
+                        <EditIcon color={colors.icon} width={22} height={22} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[styles.floatingIconButton, { backgroundColor: colors.background }]}
                         activeOpacity={0.7}
                     >
-                        <IconSymbol size={20} name="square.and.arrow.up" color={colors.text} />
+                        <ShareIcon color={colors.icon} width={22} height={22} />
                     </TouchableOpacity>
                 </Animated.View>
             </View>
@@ -605,14 +607,14 @@ export const UserPortfolio = () => {
                             activeOpacity={0.7}
                             hitSlop={8}
                         >
-                            <IconSymbol size={20} name="pencil.line" color={colors.text} />
+                            <EditIcon color={colors.icon} width={22} height={22} />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.iconButton}
                             activeOpacity={0.7}
                             hitSlop={8}
                         >
-                            <IconSymbol size={20} name="square.and.arrow.up.fill" color={colors.text} />
+                            <ShareIcon color={colors.icon} width={22} height={22} />
                         </TouchableOpacity>
                     </View>
                 </View>

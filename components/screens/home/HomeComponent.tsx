@@ -17,6 +17,8 @@ import {
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NewPostsIndicator } from './NewPostsIndicator';
+import { PostCard } from './PostCard';
 
 // Mock categories - Replace with actual database
 const CATEGORIES = [
@@ -31,22 +33,149 @@ const CATEGORIES = [
     { id: '8', name: 'Evening Wear', icon: 'moon' },
 ];
 
+// Mock posts data - Replace with actual database/API
+const MOCK_POSTS = [
+    {
+        id: '1',
+        user: {
+            name: 'Sarah Johnson',
+            username: 'sarahjdesigns',
+            avatarUri: 'https://i.pravatar.cc/150?img=1',
+        },
+        caption: 'Just finished this stunning bridal collection! 💍✨ What do you think? Available for custom orders.',
+        media: [
+            { id: 'm1', uri: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800', type: 'image' as const },
+            { id: 'm2', uri: 'https://images.unsplash.com/photo-1519657337289-077653f724ed?w=800', type: 'image' as const },
+            { id: 'm3', uri: 'https://images.unsplash.com/photo-1594552072238-6d37f4145e84?w=800', type: 'image' as const },
+            { id: 'm4', uri: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800', type: 'image' as const },
+        ],
+        location: 'Lagos, Nigeria',
+        category: 'Bridal',
+        likes: 1234,
+        comments: 89,
+        views: 5678,
+        isLiked: false,
+        isSaved: false,
+        createdAt: '2h ago',
+    },
+    {
+        id: '2',
+        user: {
+            name: 'Michael Chen',
+            username: 'mchen_fashion',
+            avatarUri: 'https://i.pravatar.cc/150?img=12',
+        },
+        caption: '🎥 Behind the scenes of our latest streetwear collection shoot! The energy was incredible 🔥',
+        media: [
+            { 
+                id: 'v1', 
+                uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 
+                type: 'video' as const,
+                duration: 120,
+            },
+        ],
+        location: 'New York, USA',
+        category: 'Streetwear',
+        likes: 2341,
+        comments: 156,
+        views: 12453,
+        isLiked: true,
+        isSaved: false,
+        createdAt: '5h ago',
+    },
+    {
+        id: '3',
+        user: {
+            name: 'Amara Okafor',
+            username: 'amara_couture',
+            avatarUri: 'https://i.pravatar.cc/150?img=5',
+        },
+        caption: 'Traditional meets modern in this Ankara masterpiece. Preserving culture through fashion 🇳🇬❤️',
+        media: [
+            { id: 'm5', uri: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800', type: 'image' as const },
+        ],
+        location: 'Abuja, Nigeria',
+        category: 'Traditional',
+        likes: 892,
+        comments: 45,
+        views: 3421,
+        isLiked: false,
+        isSaved: true,
+        createdAt: '1d ago',
+    },
+    {
+        id: '4',
+        user: {
+            name: 'Emma Rodriguez',
+            username: 'emma_styles',
+            avatarUri: 'https://i.pravatar.cc/150?img=9',
+        },
+        caption: 'Corporate elegance redefined. Perfect for the modern professional woman 👔',
+        media: [
+            { id: 'm6', uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800', type: 'image' as const },
+            { id: 'm7', uri: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800', type: 'image' as const },
+            { id: 'm8', uri: 'https://thevou.com/wp-content/uploads/2024/06/what-is-a-fashion-trend-or-trendy-fashion-696x1044.jpg', type: 'image' as const },
+        ],
+        location: 'London, UK',
+        category: 'Corporate',
+        likes: 543,
+        comments: 32,
+        views: 2187,
+        isLiked: false,
+        isSaved: false,
+        createdAt: '2d ago',
+    },
+    {
+        id: '5',
+        user: {
+            name: 'David Park',
+            username: 'davidpark_shoes',
+            avatarUri: 'https://i.pravatar.cc/150?img=15',
+        },
+        caption: 'New collection drop! 👟 Handcrafted leather shoes for every occasion. Limited stock available.',
+        media: [
+            { id: 'm9', uri: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800', type: 'image' as const },
+            { id: 'm10', uri: 'https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=800', type: 'image' as const },
+        ],
+        location: 'Seoul, South Korea',
+        category: 'Shoes',
+        likes: 678,
+        comments: 54,
+        views: 2890,
+        isLiked: true,
+        isSaved: true,
+        createdAt: '3d ago',
+    },
+];
+
+// Mock new posts for indicator
+const MOCK_NEW_POSTS = [
+    { userId: '101', userName: 'Jane Doe', avatarUri: 'https://i.pravatar.cc/150?img=20' },
+    { userId: '102', userName: 'John Smith', avatarUri: 'https://i.pravatar.cc/150?img=21' },
+    { userId: '103', userName: 'Lisa Wang', avatarUri: 'https://i.pravatar.cc/150?img=22' },
+    { userId: '104', userName: 'Alex Brown', avatarUri: 'https://i.pravatar.cc/150?img=23' },
+    { userId: '105', userName: 'Maria Garcia', avatarUri: 'https://i.pravatar.cc/150?img=24' },
+];
+
 export const HomeComponent = () => {
     const { colors } = useAppTheme();
     const insets = useSafeAreaInsets();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [categoryDropdownVisible, setCategoryDropdownVisible] = useState(false);
+    const [showNewPosts, setShowNewPosts] = useState(true);
     const scrollY = useRef(new Animated.Value(0)).current;
     const lastScrollY = useRef(0);
     const headerTranslateY = useRef(new Animated.Value(0)).current;
     const categoryListHeight = useRef(new Animated.Value(0)).current;
     const isHeaderHidden = useRef(false);
+    const flatListRef = useRef<any>(null);
 
-    // Mock posts data
-    const posts = Array.from({ length: 20 }, (_, i) => ({
-        id: String(i + 1),
-        title: `Post ${i + 1}`,
-    }));
+    // Mock posts data - filter by category
+    const posts = selectedCategory === 'all' 
+        ? MOCK_POSTS 
+        : MOCK_POSTS.filter(post => 
+            post.category?.toLowerCase() === CATEGORIES.find(c => c.id === selectedCategory)?.name.toLowerCase()
+          );
 
     const selectedCategoryName =
         CATEGORIES.find((cat) => cat.id === selectedCategory)?.name || 'All';
@@ -83,12 +212,18 @@ export const HomeComponent = () => {
                 const currentScrollY = event.nativeEvent.contentOffset.y;
                 const diff = currentScrollY - lastScrollY.current;
                 const headerHeight = 60 + insets.top;
+                const categoryOffset = 52;
+                const totalHideDistance = headerHeight + categoryOffset + 60; // 60 is category max height
 
                 if (diff > 10 && currentScrollY > 60 && !isHeaderHidden.current) {
-                    // Scrolling down (content going up) - hide header
+                    // Scrolling down (content going up) - hide header and category
                     isHeaderHidden.current = true;
+                    // Close category dropdown when hiding
+                    if (categoryDropdownVisible) {
+                        closeCategoryDropdown();
+                    }
                     Animated.timing(headerTranslateY, {
-                        toValue: -headerHeight,
+                        toValue: -totalHideDistance,
                         duration: 200,
                         useNativeDriver: true,
                     }).start();
@@ -107,6 +242,13 @@ export const HomeComponent = () => {
         }
     );
 
+    const handleLoadNewPosts = () => {
+        setShowNewPosts(false);
+        // Scroll to top
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        // In real app, fetch new posts here
+    };
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Animated Header */}
@@ -115,7 +257,7 @@ export const HomeComponent = () => {
                     styles.header,
                     {
                         backgroundColor: colors.surface + 'F0',
-                        paddingTop: insets.top,
+                        paddingTop: insets.top + 10,
                         transform: [{ translateY: headerTranslateY }],
                     },
                 ]}
@@ -205,73 +347,84 @@ export const HomeComponent = () => {
             {/* Category Horizontal List */}
             <Animated.View
                 style={[
-                    styles.categoryListContainer,
+                    styles.categoryListWrapper,
                     {
-                        backgroundColor: colors.surface + 'F0',
-                        borderTopColor: colors.border,
                         top: insets.top + 52,
-                        maxHeight: categoryListHeight,
-                        opacity: categoryListHeight.interpolate({
-                            inputRange: [0, 60],
-                            outputRange: [0, 1],
-                        }),
+                        transform: [{ translateY: headerTranslateY }],
                     },
                 ]}
-                pointerEvents={categoryDropdownVisible ? 'auto' : 'none'}
             >
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.categoryScrollContent}
+                <Animated.View
+                    style={[
+                        styles.categoryListContainer,
+                        {
+                            backgroundColor: colors.surface + 'F0',
+                            borderTopColor: colors.border,
+                            borderBottomColor: colors.border,
+                            maxHeight: categoryListHeight,
+                            opacity: categoryListHeight.interpolate({
+                                inputRange: [0, 60],
+                                outputRange: [0, 1],
+                            }),
+                        },
+                    ]}
+                    pointerEvents={categoryDropdownVisible ? 'auto' : 'none'}
                 >
-                    {CATEGORIES.map((category) => {
-                        const isSelected = selectedCategory === category.id;
-                        return (
-                            <Pressable
-                                key={category.id}
-                                onPress={() => {
-                                    setSelectedCategory(category.id);
-                                    closeCategoryDropdown();
-                                }}
-                                style={[
-                                    styles.categoryChipHorizontal,
-                                    {
-                                        backgroundColor: isSelected
-                                            ? colors.primary + '25'
-                                            : colors.background,
-                                        borderColor: isSelected
-                                            ? colors.primary
-                                            : colors.border,
-                                    },
-                                ]}
-                            >
-                                <IconSymbol
-                                    name={category.icon as any}
-                                    size={16}
-                                    color={isSelected ? colors.primary : colors.textSecondary}
-                                />
-                                <Typography
-                                    variant="caption"
-                                    weight={isSelected ? 'semiBold' : 'regular'}
-                                    color={isSelected ? colors.primary : colors.text}
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryScrollContent}
+                    >
+                        {CATEGORIES.map((category) => {
+                            const isSelected = selectedCategory === category.id;
+                            return (
+                                <Pressable
+                                    key={category.id}
+                                    onPress={() => {
+                                        setSelectedCategory(category.id);
+                                        closeCategoryDropdown();
+                                    }}
+                                    style={[
+                                        styles.categoryChipHorizontal,
+                                        {
+                                            backgroundColor: isSelected
+                                                ? colors.primary + '25'
+                                                : colors.background,
+                                            borderColor: isSelected
+                                                ? colors.primary
+                                                : colors.border,
+                                        },
+                                    ]}
                                 >
-                                    {category.name}
-                                </Typography>
-                                {isSelected && (
                                     <IconSymbol
-                                        name="checkmark.circle.fill"
+                                        name={category.icon as any}
                                         size={16}
-                                        color={colors.primary}
+                                        color={isSelected ? colors.primary : colors.textSecondary}
                                     />
-                                )}
-                            </Pressable>
-                        );
-                    })}
-                </ScrollView>
+                                    <Typography
+                                        variant="caption"
+                                        weight={isSelected ? 'semiBold' : 'regular'}
+                                        color={isSelected ? colors.primary : colors.text}
+                                    >
+                                        {category.name}
+                                    </Typography>
+                                    {isSelected && (
+                                        <IconSymbol
+                                            name="checkmark.circle.fill"
+                                            size={16}
+                                            color={colors.primary}
+                                        />
+                                    )}
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
+                </Animated.View>
             </Animated.View>
 
             {/* Content */}
             <Animated.FlatList
+                ref={flatListRef}
                 data={posts}
                 keyExtractor={(item) => item.id}
                 onScroll={handleScroll}
@@ -282,18 +435,27 @@ export const HomeComponent = () => {
                     { paddingTop: insets.top + 60 + Spacing.md },
                 ]}
                 renderItem={({ item }) => (
-                    <View
-                        style={[
-                            styles.postPlaceholder,
-                            { backgroundColor: colors.surface },
-                        ]}
-                    >
-                        <Typography variant="body" color={colors.text}>
-                            {item.title}
+                    <PostCard post={item} />
+                )}
+                ListEmptyComponent={
+                    <View style={styles.emptyState}>
+                        <IconSymbol name="photo.on.rectangle" size={48} color={colors.textTertiary} />
+                        <Typography variant="body" color={colors.textSecondary} style={{ marginTop: Spacing.sm }}>
+                            No posts in this category yet
                         </Typography>
                     </View>
-                )}
+                }
             />
+
+            {/* New Posts Indicator */}
+            {showNewPosts && (
+                <View style={[styles.newPostsContainer, { top: insets.top + 70 }]}>
+                    <NewPostsIndicator 
+                        newPosts={MOCK_NEW_POSTS}
+                        onPress={handleLoadNewPosts}
+                    />
+                </View>
+            )}
 
 
         </View>
@@ -334,21 +496,18 @@ const styles = StyleSheet.create({
         gap: Spacing.md,
     },
     content: {
-        paddingHorizontal: Spacing.lg,
-        paddingBottom: Spacing.xl,
+        paddingBottom: Spacing['3xl'],
     },
-    postPlaceholder: {
-        padding: Spacing.lg,
-        borderRadius: BorderRadius.lg,
-        marginBottom: Spacing.md,
-    },
-    categoryListContainer: {
+    categoryListWrapper: {
         position: 'absolute',
         left: 0,
         right: 0,
         zIndex: 999,
+    },
+    categoryListContainer: {
         overflow: 'hidden',
         borderTopWidth: 1,
+        borderBottomWidth: 1,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
@@ -375,5 +534,18 @@ const styles = StyleSheet.create({
         paddingVertical: Spacing.xs,
         borderRadius: BorderRadius.full,
         borderWidth: 1,
+    },
+    newPostsContainer: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 998,
+    },
+    emptyState: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: Spacing.lg,
+        paddingVertical: Spacing.xl * 2,
     },
 });
